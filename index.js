@@ -1,0 +1,301 @@
+const express = require('express');
+const http = require('http');
+const bodyParser = require('body-parser');
+const socketio = require('socket.io');
+
+const MongoClient = require('mongodb').MongoClient;
+const ObjectID = require('mongodb').ObjectID;
+
+const app = express();
+const server = http.Server(app);
+const websocket = socketio(server);
+
+const mongoPw = process.env.MONGO_PASSWORD;
+const mongoUser = process.env.MONGO_USER;
+
+const uri = 'mongodb://' + mongoUser + ':' + mongoPw + '@nativematch-shard-00-00-fvbif.mongodb.net:27017,nativematch-shard-00-01-fvbif.mongodb.net:27017,nativematch-shard-00-02-fvbif.mongodb.net:27017/test?ssl=true&replicaSet=nativeMatch-shard-0&authSource=admin';
+
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
+app.use('/', (req, res, next) => {
+	console.log(req.originalUrl);
+	next();
+})
+
+var mongoConnection;
+MongoClient.connect(uri, function(err, client) {
+	mongoConnection = client.db('nativeMatch');
+	console.log('Database connected');
+});
+
+app.use(function(req, res, next) {
+	req.db = mongoConnection;
+	next();
+});
+
+app.post('/login', (req, res) => {
+	req.db.collection('user').findOne({username: req.body.username})
+	.then((user) => {
+		if(user && user.password == req.body.password) {
+			res.send(JSON.stringify({
+				success: true,
+				userId: user._id,
+			}));
+		} else {
+			res.send(JSON.stringify({
+				success: false,
+			}));
+		}
+	});
+});
+
+class UserError extends Error {};
+
+app.post('/createAccount', (req, res) => {
+	req.db.collection('user').findOne({username: req.body.username})
+	.then((user) => {
+		if(user) {
+			return Promise.reject(new UserError('Username Taken'));
+		} else {
+			return Promise.resolve();
+		}
+	}).then(() => {
+		return req.db.collection('user').insertOne({
+			username: req.body.username,
+			password: req.body.password,
+		});
+	}).then((user) => {
+		res.send(JSON.stringify({
+			success: true,
+			userId: user.insertedId,
+		}));	
+	}).catch((error) => {
+		console.log(error);
+		const message = error instanceof UserError ? error.message : 'Something Went Wrong';
+		res.send(JSON.stringify({
+			success: false,
+			reason: message,
+		}));
+	});
+});
+
+app.post('/event/rsvp', (req, res) => {
+	req.db.collection('event').update({_id: new ObjectID(req.body.eventId)},
+		{ $push: { attendees: req.body.userId } }
+	).catch((error) => {
+		console.log(error);
+	});
+	req.db.collection('user').update({_id: new ObjectID(req.body.userId)},
+		{ $push: {attending: req.body.eventId } }
+	).catch((error) => {
+		console.log(error);
+	});
+	res.send(JSON.stringify({success: true}));
+});
+
+app.post('/event/cancel', (req, res) => {
+	req.db.collection('event').update({_id: new ObjectID(req.body.eventId)},
+		{ $pull: { attendees: req.body.userId } }
+	).then((result) => {
+		res.send(JSON.stringify({success: true}));
+	}).catch((error) => {
+		console.log(error);
+	});
+});
+
+app.get('/events', (req, res) => {
+	req.db.collection('event').find({}, {sort: ['startTime', 'endTime']})
+	.toArray()
+	.then((events) => {
+		res.send(JSON.stringify(events));
+	}).catch((error) => {
+		console.log(error);
+	});
+});
+
+app.get('/event/:id', (req, res) => {
+	req.db.collection('event').findOne({ _id: new ObjectID(req.params.id) })
+	.then((evt) => {
+		res.send(JSON.stringify(evt));
+	}).catch((err) => {
+		console.log(err);
+	});
+});
+
+app.get('/rsvp', (req, res) => {
+	req.db.collection('event').findOne({_id: new ObjectID(req.query.eventId)})
+	.then((evt) => {
+		res.send(JSON.stringify({
+			attending: (evt.attendees.indexOf(req.query.userId) > -1)
+		}));
+	}).catch((err) => {
+		console.log(err);
+	});
+});
+
+app.get('/user/:id', (req, res) => {
+	req.db.collection('user').findOne({_id: new ObjectID(req.params.id)})
+	.then((user) => {
+		res.send(JSON.stringify(user));
+	}).catch((err) => {
+		console.log(err);
+	});
+});
+
+app.put('/user/:id', (req, res) => {
+	delete req.body.profile._id;
+	delete req.body.profile.id;
+	delete req.body.profile.username;
+	delete req.body.profile.password;
+	req.db.collection('user').updateOne(
+		{_id: new ObjectID(req.params.id)},
+		{ $set: req.body.profile }
+	).then((result) => {
+		res.send(JSON.stringify({success: true}));
+	}).catch((error) => {
+		console.log(error);
+	});
+});
+
+function isEligable(user, test_id, db) {
+	return db.collection('user').findOne({_id: new ObjectID(test_id)})
+	.then((test_user) => {
+		if(test_user.age > user.interestsAgeMax || test_user.age < user.interestsAgeMin) {
+			return false;
+		}
+		if(test_user.gender != user.interestsGender && user.interestsGender != 'Any'){
+			return false;
+		}
+		if(user.liked.includes(test_id) || user.disliked.includes(test_id)){
+			return false;
+		}
+		//TODO: Test distance and whatever else
+		return true;
+	});
+}
+
+app.get('/possibleMatches/:id', (req, res) => {
+	req.db.collection('user').findOne({ _id: new ObjectID(req.params.id) })
+	.then((user) => {
+		let attendingEvents = [];
+		for(var i=0; i<user.attending.length; i++){
+			attendingEvents.push(new ObjectID(user.attending[i]));
+		}
+		req.db.collection('event').find({ _id: { $in: attendingEvents } }).toArray()
+		.then((events) => {
+			let users = events.reduce((users, evt) => {
+				for(var i = 0; i<evt.attendees.length; i++){
+					if(evt.attendees[i] != req.params.id){
+						users.add(evt.attendees[i]);
+					}
+				}
+				return users;
+			}, new Set());
+
+			var usersArray = [...users];
+			Promise.all(usersArray.map(entry => isEligable(user, entry, req.db)))
+			.then(bits => usersArray.filter(entry => bits.shift()))
+			.then((results) => {
+				res.send(JSON.stringify({
+					swipeDeck: results
+				}));
+			});	
+		}).catch((error) => {
+			console.log(error);
+		});
+	});
+});
+
+function createMatch(userId, swipeId, db){
+	db.collection('user').update({ _id: new ObjectID(userId) },
+		{ $push: { matches: swipeId } }
+	).catch((error) => {
+		console.log(error);
+	});
+	db.collection('user').update({ _id: new ObjectID(swipeId) },
+		{ $push: { matches: userId } }
+	).catch((error) => {
+		console.log(error);
+	});
+	db.collection('chat').insertOne({
+		userIds: [userId, swipeId],
+		messages: [],
+	}).catch((error) => {
+		console.log(errro);
+	});
+}
+
+function checkMatch(userId, swipeId, db){
+	db.collection('user').findOne({ _id: new ObjectID(userId) })
+	.then((user) => {
+		db.collection('user').findOne({ _id: new ObjectID(swipeId) })
+		.then((swipe) => {
+			if(swipe.liked.includes(userId) && user.liked.includes(swipeId)){
+				//TODO: send notifications of some kind
+				
+				createMatch(userId, swipeId, db);
+			} else {
+			}
+		}).catch((error) => {
+			console.log(error);
+		});
+	}).catch((error) => {
+		console.log(error);
+	});
+}
+
+app.post('/swipe', (req, res) => {
+	if(req.body.liked){
+		req.db.collection('user').update({ _id: new ObjectID(req.body.userId) },
+			{ $push: { liked: req.body.swipeId }}
+		).then(() => {
+			checkMatch(req.body.userId, req.body.swipeId, req.db);
+		}).catch((error) => {
+			console.log(error);
+		});
+	} else {
+		req.db.collection('user').update({ _id: new ObjectID(req.body.userId) },
+			{ $push: { disliked: req.body.swipeId }}
+		).then(() => {
+			checkMatch(req.body.userId, req.body.swipeId, req.db);
+		}).catch((error) => {
+			console.log(error);
+		});
+	}
+	res.send({ success: true });
+});
+
+app.get('/chats/:id', (req, res) => {
+	req.db.collection('chat').find({ userIds: req.params.id }).toArray()
+	.then((chats) => {
+		res.send(JSON.stringify(chats.reverse()));
+	}).catch((error) => {
+		console.log(error);
+	});
+});
+
+server.listen(3000, () => console.log('Server running on port 3000'));
+
+websocket.on('connection', function (socket) {
+	let id = socket.handshake.query.chatId;
+	socket.join(id);
+
+	socket.on('sendMessage', function(data) {
+		mongoConnection.collection('chat').updateOne(
+			{_id: new ObjectID(id) },
+			{ $push: { messages: data.message[0] } }
+		).then(() => {
+			console.log('update successful');
+		}).catch((error) => {
+			console.log(error);
+		});
+		socket.broadcast.to(id).emit('receiveMessage', {
+			message: data,
+		});
+	});
+
+	socket.on('disconnect', function(data) {
+		socket.leave(id);
+	});
+});
