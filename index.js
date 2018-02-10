@@ -1,10 +1,15 @@
+const fs = require('fs');
 const express = require('express');
+const fileUpload = require('express-fileupload');
 const http = require('http');
 const bodyParser = require('body-parser');
 const socketio = require('socket.io');
 
+const mongo = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
+const GridFSBucket = require('mongodb').GridFSBucket;
+const Grid = require('gridfs');
 
 const app = express();
 const server = http.Server(app);
@@ -15,8 +20,10 @@ const mongoUser = process.env.MONGO_USER;
 
 const uri = 'mongodb://' + mongoUser + ':' + mongoPw + '@nativematch-shard-00-00-fvbif.mongodb.net:27017,nativematch-shard-00-01-fvbif.mongodb.net:27017,nativematch-shard-00-02-fvbif.mongodb.net:27017/test?ssl=true&replicaSet=nativeMatch-shard-0&authSource=admin';
 
+
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+app.use(fileUpload());
 
 app.use('/', (req, res, next) => {
 	console.log(req.originalUrl);
@@ -24,8 +31,10 @@ app.use('/', (req, res, next) => {
 })
 
 var mongoConnection;
+var gfs;
 MongoClient.connect(uri, function(err, client) {
 	mongoConnection = client.db('nativeMatch');
+    gfs = Grid(mongoConnection, mongo);
 	console.log('Database connected');
 });
 
@@ -133,6 +142,40 @@ app.get('/rsvp', (req, res) => {
 		console.log(err);
 	});
 });
+
+app.post('/user/:id/photos', (req, res) => {
+    console.log('update photos');
+    console.log(req.files);
+    console.log(req.body);
+    console.log(req.params.id);
+
+    gfs.writeFile({filename: 'test', mode: 'w', content_type: 'image'}, req.files.photo.data, (err, file) => {
+        if(err) throw Error('Shit done fucked');
+        req.db.collection('users').updateOne(
+            {_id: new ObjectID(req.params.id)},
+            { $push: { photos: file._id } }
+        ).then(() => {
+            res.send(JSON.stringify({
+                success: 'true',
+                photoId: file._id,
+            }));
+        }).catch((error) => {
+            console.log(error);
+        });
+    });
+});
+
+app.get('/user/photo/:id', (req, res) => {
+    console.log(req.params.id);
+    gfs.readFile({_id: new ObjectID(req.params.id)}, (err, data) => {
+        console.log(err);
+        console.log(data);
+        res.send(JSON.stringify({
+            data: data
+        }));
+    });
+});
+
 
 app.get('/user/:id', (req, res) => {
 	req.db.collection('user').findOne({_id: new ObjectID(req.params.id)})
