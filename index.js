@@ -19,12 +19,6 @@ const mongoUser = process.env.MONGO_USER;
 
 const uri = 'mongodb://' + mongoUser + ':' + mongoPw + '@nativematch-shard-00-00-fvbif.mongodb.net:27017,nativematch-shard-00-01-fvbif.mongodb.net:27017,nativematch-shard-00-02-fvbif.mongodb.net:27017/test?ssl=true&replicaSet=nativeMatch-shard-0&authSource=admin';
 
-const auth = require('./src/auth.js');
-const chat = require('./src/chat.js');
-const event = require('./src/event.js');
-const swipe = require('./src/swipe.js');
-const user = require('./src/user.js');
-
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(fileUpload());
@@ -48,11 +42,11 @@ app.use(function(req, res, next) {
 	next();
 });
 
-app.use('/auth', auth);
-app.use('/chat', chat);
-app.use('/event', event);
-app.use('/swipe', swipe);
-app.use('/user', user);
+app.use('/auth', require('./src/auth.js'));
+app.use('/chat', require('./src/chat.js'));
+app.use('/event', require('./src/event.js'));
+app.use('/swipe', require('./src/swipe.js'));
+app.use('/user', require('./src/user.js'));
 
 
 server.listen(3000, () => console.log('Server running on port 3000'));
