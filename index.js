@@ -48,7 +48,6 @@ app.use('/event', require('./src/event.js'));
 app.use('/swipe', require('./src/swipe.js'));
 app.use('/user', require('./src/user.js'));
 
-
 server.listen(3000, () => console.log('Server running on port 3000'));
 
 websocket.on('connection', function (socket) {
