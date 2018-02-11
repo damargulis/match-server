@@ -90,7 +90,7 @@ function checkMatch(userId, swipeId, db){
 	});
 }
 
-router.post('/swipe', (req, res) => {
+router.post('/', (req, res) => {
 	if(req.body.liked){
 		req.db.collection('user').update({ _id: new ObjectID(req.body.userId) },
 			{ $push: { liked: req.body.swipeId }}

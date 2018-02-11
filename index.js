@@ -50,25 +50,8 @@ app.use('/user', require('./src/user.js'));
 
 server.listen(3000, () => console.log('Server running on port 3000'));
 
-websocket.on('connection', function (socket) {
-	let id = socket.handshake.query.chatId;
-	socket.join(id);
+var onConnect = require('./src/chatSocket.js').onConnect;
 
-	socket.on('sendMessage', function(data) {
-		mongoConnection.collection('chat').updateOne(
-			{_id: new ObjectID(id) },
-			{ $push: { messages: data.message[0] } }
-		).then(() => {
-			console.log('update successful');
-		}).catch((error) => {
-			console.log(error);
-		});
-		socket.broadcast.to(id).emit('receiveMessage', {
-			message: data,
-		});
-	});
-
-	socket.on('disconnect', function(data) {
-		socket.leave(id);
-	});
+websocket.on('connection', (socket) => {
+    onConnect(socket, mongoConnection);
 });
