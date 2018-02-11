@@ -20,7 +20,6 @@ router.post('/:id/photos', (req, res) => {
 });
 
 router.get('/photo/:id', (req, res) => {
-    console.log(req.params.id);
     req.gfs.readFile({_id: new ObjectID(req.params.id)}, (err, data) => {
         if(err) console.log(err);
         res.send(JSON.stringify({

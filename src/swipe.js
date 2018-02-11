@@ -20,7 +20,6 @@ function isEligable(user, test_id, db) {
 }
 
 router.get('/possibleMatches/:id', (req, res) => {
-    console.log('made it here');
 	req.db.collection('user').findOne({ _id: new ObjectID(req.params.id) })
 	.then((user) => {
 		let attendingEvents = [];

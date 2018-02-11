@@ -8,9 +8,7 @@ var onConnect = (socket, mongoConnection) => {
 		mongoConnection.collection('chat').updateOne(
 			{_id: new ObjectID(id) },
 			{ $push: { messages: data.message[0] } }
-		).then(() => {
-			console.log('update successful');
-		}).catch((error) => {
+		).catch((error) => {
 			console.log(error);
 		});
 		socket.broadcast.to(id).emit('receiveMessage', {
