@@ -55,14 +55,9 @@ app.use('/user', user);
 var swipe = require('./src/swipe.js');
 app.use('/swipe', swipe);
 
-app.get('/chats/:id', (req, res) => {
-	req.db.collection('chat').find({ userIds: req.params.id }).toArray()
-	.then((chats) => {
-		res.send(JSON.stringify(chats.reverse()));
-	}).catch((error) => {
-		console.log(error);
-	});
-});
+var chat = require('./src/chat.js');
+app.use('/chat', chat);
+
 
 server.listen(3000, () => console.log('Server running on port 3000'));
 
