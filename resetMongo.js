@@ -3,6 +3,8 @@ const MongoClient = require('mongodb').MongoClient;
 const mongoPw = process.env.MONGO_PASSWORD;
 const mongoUser = process.env.MONGO_USER;
 
+var passwordHash = require('password-hash');
+
 const uri = 'mongodb://' + mongoUser + ':' + mongoPw + '@nativematch-shard-00-00-fvbif.mongodb.net:27017,nativematch-shard-00-01-fvbif.mongodb.net:27017,nativematch-shard-00-02-fvbif.mongodb.net:27017/test?ssl=true&replicaSet=nativeMatch-shard-0&authSource=admin';
 
 function reset() {
@@ -19,10 +21,11 @@ function reset() {
 		nativeMatch = database.db('nativeMatch');
 		const user = nativeMatch.collection('user');
 		console.log('inserting test users');
+
 		return user.insertMany([
 			{
 				username: 'test',
-				password: 'test',
+                password: passwordHash.generate('test'),
 				firstName: 'Dan',
 				age: 23,
 				gender: 'Male',
@@ -38,7 +41,7 @@ function reset() {
                 photos: [],
 			}, {
 				username: 'test1',
-				password: 'test1',
+                password: passwordHash.generate('test1'),
 				firstName: 'Jane',
 				age: 23,
 				gender: 'Female',

@@ -1,12 +1,16 @@
 var express = require('express');
 var router = express.Router();
+var passwordHash = require('password-hash');
 
 class UserError extends Error {};
 
 router.post('/login', (req, res) => {
 	req.db.collection('user').findOne({username: req.body.username})
 	.then((user) => {
-		if(user && user.password == req.body.password) {
+        console.log(user);
+        console.log(req.body.password);
+        console.log(passwordHash.verify(req.body.password, user.password));
+        if(user && passwordHash.verify(req.body.password, user.password)) {
 			res.send(JSON.stringify({
 				success: true,
 				userId: user._id,
@@ -28,9 +32,10 @@ router.post('/createAccount', (req, res) => {
 			return Promise.resolve();
 		}
 	}).then(() => {
+        var hashedPassword = passwordHash.generate(req.body.password);
 		return req.db.collection('user').insertOne({
 			username: req.body.username,
-			password: req.body.password,
+            password: hashedPassword,
 		});
 	}).then((user) => {
 		res.send(JSON.stringify({
