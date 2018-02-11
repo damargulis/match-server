@@ -35,6 +35,7 @@ function reset() {
 				attending: [],
 				liked: [],
 				disliked: [],
+                photos: [],
 			}, {
 				username: 'test1',
 				password: 'test1',
@@ -50,6 +51,7 @@ function reset() {
 				attending: [],
 				liked: [],
 				disliked: [],
+                photos: [],
 			}
 		]);
 	}).then(() => {
