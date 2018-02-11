@@ -151,10 +151,14 @@ app.post('/user/:id/photos', (req, res) => {
 
     gfs.writeFile({filename: 'test', mode: 'w', content_type: 'image'}, req.files.photo.data, (err, file) => {
         if(err) throw Error('Shit done fucked');
-        req.db.collection('users').updateOne(
+        console.log('file_id');
+        console.log(file._id);
+        console.log(req.params.id);
+        req.db.collection('user').updateOne(
             {_id: new ObjectID(req.params.id)},
             { $push: { photos: file._id } }
-        ).then(() => {
+        ).then((success) => {
+            console.log(success);
             res.send(JSON.stringify({
                 success: 'true',
                 photoId: file._id,
