@@ -44,62 +44,10 @@ app.use(function(req, res, next) {
 });
 
 var auth = require('./src/auth.js');
-
 app.use('/auth', auth);
 
-app.post('/event/rsvp', (req, res) => {
-	req.db.collection('event').update({_id: new ObjectID(req.body.eventId)},
-		{ $push: { attendees: req.body.userId } }
-	).catch((error) => {
-		console.log(error);
-	});
-	req.db.collection('user').update({_id: new ObjectID(req.body.userId)},
-		{ $push: {attending: req.body.eventId } }
-	).catch((error) => {
-		console.log(error);
-	});
-	res.send(JSON.stringify({success: true}));
-});
-
-app.post('/event/cancel', (req, res) => {
-	req.db.collection('event').update({_id: new ObjectID(req.body.eventId)},
-		{ $pull: { attendees: req.body.userId } }
-	).then((result) => {
-		res.send(JSON.stringify({success: true}));
-	}).catch((error) => {
-		console.log(error);
-	});
-});
-
-app.get('/events', (req, res) => {
-	req.db.collection('event').find({}, {sort: ['startTime', 'endTime']})
-	.toArray()
-	.then((events) => {
-		res.send(JSON.stringify(events));
-	}).catch((error) => {
-		console.log(error);
-	});
-});
-
-app.get('/event/:id', (req, res) => {
-	req.db.collection('event').findOne({ _id: new ObjectID(req.params.id) })
-	.then((evt) => {
-		res.send(JSON.stringify(evt));
-	}).catch((err) => {
-		console.log(err);
-	});
-});
-
-app.get('/rsvp', (req, res) => {
-	req.db.collection('event').findOne({_id: new ObjectID(req.query.eventId)})
-	.then((evt) => {
-		res.send(JSON.stringify({
-			attending: (evt.attendees.indexOf(req.query.userId) > -1)
-		}));
-	}).catch((err) => {
-		console.log(err);
-	});
-});
+var event = require('./src/event.js');
+app.use('/event', event);
 
 app.post('/user/:id/photos', (req, res) => {
     console.log('update photos');
