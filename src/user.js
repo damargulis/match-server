@@ -3,13 +3,11 @@ var router = express.Router();
 const ObjectID = require('mongodb').ObjectID;
 
 router.post('/:id/location', (req, res) => {
-    console.log('location');
     let id = req.params.id;
     let loc = req.body;
     req.db.collection('user').updateOne({_id: new ObjectID(req.params.id)},
         { $set: {location: req.body } }
     ).then((response) => {
-        console.log(response);
         res.send(JSON.stringify({ success: true }));
     }).catch((error) => {
         console.log(error);

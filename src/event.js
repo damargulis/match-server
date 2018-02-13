@@ -48,7 +48,19 @@ router.get('/:id', (req, res) => {
 });
 
 router.get('/', (req, res) => {
-	req.db.collection('event').find({}, {sort: ['startTime', 'endTime']})
+	req.db.collection('event').find({
+        location: {
+            $near: {
+                $geometry: {
+                    type: "Point",
+                    coordinates: [
+                        parseFloat(req.query.long),
+                        parseFloat(req.query.lat),
+                    ],
+                }
+            }
+        }
+    }, {sort: ['startTime', 'endTime']})
 	.toArray()
 	.then((events) => {
 		res.send(JSON.stringify(events));

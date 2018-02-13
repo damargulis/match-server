@@ -7,9 +7,6 @@ class UserError extends Error {};
 router.post('/login', (req, res) => {
 	req.db.collection('user').findOne({username: req.body.username})
 	.then((user) => {
-        console.log(user);
-        console.log(req.body.password);
-        console.log(passwordHash.verify(req.body.password, user.password));
         if(user && passwordHash.verify(req.body.password, user.password)) {
 			res.send(JSON.stringify({
 				success: true,

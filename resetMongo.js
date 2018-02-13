@@ -36,8 +36,11 @@ function reset() {
 				interestsAgeMin: 20,
 				interestsAgeMax: 25,
                 location: {
-                    lat: 38.650768,
-                    long: -90.295861,
+                    type: "Point",
+                    coordinates: [
+                        -90.295861,
+                        38.650768,
+                    ],
                 },
 				attending: [],
 				liked: [],
@@ -56,8 +59,11 @@ function reset() {
 				interestsAgeMin: 20,
 				interestsAgeMax: 25,
                 location: {
-                    lat: 38.650768,
-                    long: -90.295861,
+                    type: "Point",
+                    coordinates: [
+                        -90.295861,
+                        36.650768,
+                    ],
                 },
 				attending: [],
 				liked: [],
@@ -73,8 +79,11 @@ function reset() {
 				type: 'Concert',
 				name: 'Kanye Concert',
 				location: {
-					lat: 38.655606,
-					long: -90.297881,
+                    type: "Point",
+                    coordinates: [
+                        -90.297881,
+                        38.655606,
+                    ]
 				},
 				address: {
 					street: '6161 Delmar Blvd',
@@ -89,8 +98,11 @@ function reset() {
 				type: 'Bar',
 				name: 'Half Price Drinks at Three Kings',
 				location: {
-					lat: 38.655918,
-					long: -90.302944,
+                    type: 'Point',
+                    coordinates: [
+					    -90.302944,
+                        38.655918,
+                    ]
 				},
 				address: {
 					street: '6307 Delmar Blvd',
@@ -105,8 +117,11 @@ function reset() {
 				type: 'Movie',
 				name: 'Black Panther',
 				location: {
-					lat: 38.634205,
-					long: -90.316682,
+                    type: 'Point',
+                    coordinates: [
+                        -90.316682,
+                        38.634205,
+                    ]
 				},
 				address: {
 					street: '6706 Clayton Rd.',
@@ -121,8 +136,11 @@ function reset() {
                 type: 'Resturaunt',
                 name: 'Cheap Dinner at Gamlin Whiskey House',
                 location: {
-                    lat: 38.644545,
-                    long: -90.261456,
+                    type: 'Point',
+                    coordinates: [
+                        -90.261456,
+                        38.644545,
+                    ]
                 },
                 address: {
                     street: '236 N Euclid Ave',
@@ -137,8 +155,11 @@ function reset() {
                 type: 'Play',
                 name: 'Play at Peabody Opera House',
                 location: {
-                    lat: 38.627865,
-                    long: -90.201804
+                    type: 'Point',
+                    coordinates: [
+                        -90.201804,
+                        38.627865,
+                    ]
                 },
                 address: {
                 },
@@ -149,8 +170,11 @@ function reset() {
                 type: 'Sports',
                 name: 'Blues vs. Blackhawks',
                 location: {
-                    lat: 38.626842,
-                    long: -90.202684,
+                    type: 'Point',
+                    coordinates: [
+                        -90.202684,
+                        38.626842,
+                    ]
                 },
                 address: {
                     street: '1401 Clark Ave',
@@ -165,8 +189,11 @@ function reset() {
                 type: 'Museum',
                 name: 'St. Louis Art Museum Exhibt',
                 location: {
-                    lat: 38.639095,
-                    long: -90.294953,
+                    type: 'Point',
+                    coordinates: [
+                        -90.294953,
+                        38.639095,
+                    ]
                 },
                 address: {
                     street: '1 Fine Arts Dr',
@@ -178,8 +205,16 @@ function reset() {
 				endTime: new Date('2018-10-12 20:00:00'),
 				attendees: [],
             }
-		]);
+        ]);
 	}).then(() => {
+        console.log('adding event location index');
+        let user = nativeMatch.collection('user');
+        return user.ensureIndex({ location: "2dsphere" })
+    }).then(() => {
+        console.log('adding event location index')
+        let event = nativeMatch.collection('event');
+        return event.ensureIndex({ location: "2dsphere" })
+    }).then(() => {
 		console.log('finished');
 		database.close();
 	}).catch((err) => {
