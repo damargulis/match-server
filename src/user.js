@@ -2,6 +2,20 @@ var express = require('express');
 var router = express.Router();
 const ObjectID = require('mongodb').ObjectID;
 
+router.post('/:id/location', (req, res) => {
+    console.log('location');
+    let id = req.params.id;
+    let loc = req.body;
+    req.db.collection('user').updateOne({_id: new ObjectID(req.params.id)},
+        { $set: {location: req.body } }
+    ).then((response) => {
+        console.log(response);
+        res.send(JSON.stringify({ success: true }));
+    }).catch((error) => {
+        console.log(error);
+    });
+});
+
 router.post('/:id/photos', (req, res) => {
     req.gfs.writeFile({filename: 'test', mode: 'w', content_type: 'image'}, req.files.photo.data, (err, file) => {
         if(err) throw Error('Shit done fucked');

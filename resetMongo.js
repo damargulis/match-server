@@ -35,6 +35,10 @@ function reset() {
 				interestsDistance: 50,
 				interestsAgeMin: 20,
 				interestsAgeMax: 25,
+                location: {
+                    lat: 38.650768,
+                    long: -90.295861,
+                },
 				attending: [],
 				liked: [],
 				disliked: [],
@@ -51,6 +55,10 @@ function reset() {
 				interestsDistance: 50,
 				interestsAgeMin: 20,
 				interestsAgeMax: 25,
+                location: {
+                    lat: 38.650768,
+                    long: -90.295861,
+                },
 				attending: [],
 				liked: [],
 				disliked: [],
