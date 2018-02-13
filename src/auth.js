@@ -5,14 +5,18 @@ var passwordHash = require('password-hash');
 class UserError extends Error {};
 
 router.post('/login', (req, res) => {
+    console.log('here!')
 	req.db.collection('user').findOne({username: req.body.username})
 	.then((user) => {
         if(user && passwordHash.verify(req.body.password, user.password)) {
+            console.log('success')
 			res.send(JSON.stringify({
 				success: true,
 				userId: user._id,
+                user: user
 			}));
 		} else {
+            console.log('fail');
 			res.send(JSON.stringify({
 				success: false,
 			}));
