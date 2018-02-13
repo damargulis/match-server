@@ -204,6 +204,25 @@ function reset() {
 				startTime: new Date('2018-10-12 08:00:00'),
 				endTime: new Date('2018-10-12 20:00:00'),
 				attendees: [],
+            }, {
+                type: 'Bar',
+                name: 'Trivia at Tiff\'s',
+                location: {
+                    type: 'Point',
+                    coordinates: [
+                        -74.329924,
+                        40.859700,
+                    ]
+                },
+                address: {
+                    street: '73 Bloomfield Ave',
+                    city: 'Montville',
+                    state: 'NJ',
+                    zip: '07058',
+                },
+                startTime: new Date('2018-10-15 19:00:00'),
+                endTime: new Date('2018-10-15 21:00:00'),
+                attendees: [],
             }
         ]);
 	}).then(() => {

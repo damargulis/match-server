@@ -57,7 +57,8 @@ router.get('/', (req, res) => {
                         parseFloat(req.query.long),
                         parseFloat(req.query.lat),
                     ],
-                }
+                },
+                $maxDistance: 1000,
             }
         }
     }, {sort: ['startTime', 'endTime']})
