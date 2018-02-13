@@ -62,7 +62,7 @@ function reset() {
 		console.log('inserting test events');
 		return event.insertMany([
 			{
-				type: 'Show',
+				type: 'Concert',
 				name: 'Kanye Concert',
 				location: {
 					lat: 38.655606,
@@ -93,7 +93,83 @@ function reset() {
 				startTime: new Date('2018-10-10 22:00:00'),
 				endTime: new Date('2018-10-11 01:00:00'),
 				attendees: [],
-			}
+			}, {
+				type: 'Movie',
+				name: 'Black Panther',
+				location: {
+					lat: 38.634205,
+					long: -90.316682,
+				},
+				address: {
+					street: '6706 Clayton Rd.',
+					city: 'St. Louis',
+					state: 'MO',
+					zip: '63117',
+				},
+				startTime: new Date('2018-10-11 20:00:00'),
+				endTime: new Date('2018-10-11 22:00:00'),
+				attendees: [],
+            }, {
+                type: 'Resturaunt',
+                name: 'Cheap Dinner at Gamlin Whiskey House',
+                location: {
+                    lat: 38.644545,
+                    long: -90.261456,
+                },
+                address: {
+                    street: '236 N Euclid Ave',
+                    city: 'St. Louis',
+                    state: 'MO',
+                    zip: '63108',
+                },
+				startTime: new Date('2018-10-09 17:00:00'),
+				endTime: new Date('2018-10-09 22:00:00'),
+				attendees: [],
+            }, {
+                type: 'Play',
+                name: 'Play at Peabody Opera House',
+                location: {
+                    lat: 38.627865,
+                    long: -90.201804
+                },
+                address: {
+                },
+				startTime: new Date('2018-10-12 19:00:00'),
+				endTime: new Date('2018-10-12 22:00:00'),
+				attendees: [],
+            }, {
+                type: 'Sports',
+                name: 'Blues vs. Blackhawks',
+                location: {
+                    lat: 38.626842,
+                    long: -90.202684,
+                },
+                address: {
+                    street: '1401 Clark Ave',
+                    city: 'St. Louis',
+                    state: 'MO',
+                    zip: '63103',
+                },
+				startTime: new Date('2018-10-12 18:00:00'),
+				endTime: new Date('2018-10-12 22:00:00'),
+				attendees: [],
+            }, {
+                type: 'Museum',
+                name: 'St. Louis Art Museum Exhibt',
+                location: {
+                    lat: 38.639095,
+                    long: -90.294953,
+                },
+                address: {
+                    street: '1 Fine Arts Dr',
+                    city: 'St. Louis',
+                    state: 'MO',
+                    zip: '63110',
+                },
+				startTime: new Date('2018-10-12 08:00:00'),
+				endTime: new Date('2018-10-12 20:00:00'),
+				attendees: [],
+            }
 		]);
 	}).then(() => {
 		console.log('finished');
