@@ -6,7 +6,10 @@ router.post('/:id/location', (req, res) => {
     let id = req.params.id;
     let loc = req.body;
     req.db.collection('user').updateOne({_id: new ObjectID(req.params.id)},
-        { $set: {location: req.body } }
+        { $set: {location: [
+            req.body.long,
+            req.body.lat,
+        ] } }
     ).then((response) => {
         res.send(JSON.stringify({ success: true }));
     }).catch((error) => {
@@ -49,7 +52,7 @@ router.get('/:id', (req, res) => {
 	});
 });
 
-router.put('/user/:id', (req, res) => {
+router.put('/:id', (req, res) => {
 	delete req.body.profile._id;
 	delete req.body.profile.id;
 	delete req.body.profile.username;
