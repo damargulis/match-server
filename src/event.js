@@ -58,7 +58,7 @@ router.get('/', (req, res) => {
                         parseFloat(req.query.lat),
                     ],
                 },
-                $maxDistance: 1000,
+                $maxDistance: parseInt(req.query.maxDist) * 1609.344, // conver to meters
             }
         }
     }, {sort: ['startTime', 'endTime']})
