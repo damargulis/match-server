@@ -133,7 +133,7 @@ function reset() {
 				endTime: new Date('2018-10-11 22:00:00'),
 				attendees: [],
             }, {
-                type: 'Resturaunt',
+                type: 'Restaurant',
                 name: 'Cheap Dinner at Gamlin Whiskey House',
                 location: {
                     type: 'Point',
@@ -153,7 +153,7 @@ function reset() {
 				attendees: [],
             }, {
                 type: 'Play',
-                name: 'Play at Peabody Opera House',
+                name: 'Hamilton at Peabody Opera House',
                 location: {
                     type: 'Point',
                     coordinates: [
