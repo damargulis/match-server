@@ -12,7 +12,7 @@ const Grid = require('gridfs');
 
 const app = express();
 const server = http.Server(app);
-const websocket = socketio(server);
+const websocket = socketio(server, {pingTimeout: 30000});
 
 const mongoPw = process.env.MONGO_PASSWORD;
 const mongoUser = process.env.MONGO_USER;
