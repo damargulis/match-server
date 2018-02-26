@@ -31,11 +31,15 @@ router.post('/rsvp', (req, res) => {
 router.post('/cancel', (req, res) => {
 	req.db.collection('event').update({_id: new ObjectID(req.body.eventId)},
 		{ $pull: { attendees: req.body.userId } }
-	).then((result) => {
-		res.send(JSON.stringify({success: true}));
-	}).catch((error) => {
+	).catch((error) => {
 		console.log(error);
 	});
+    req.db.collection('user').update({_id: new ObjectID(req.body.userId)},
+        { $pull: { attending: req.body.eventId } }
+    ).catch((error) => {
+        console.log(error);
+    });
+    res.send(JSON.stringify({success: true}));
 });
 
 router.get('/:id', (req, res) => {
