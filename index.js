@@ -12,7 +12,7 @@ const Grid = require('gridfs');
 
 const app = express();
 const server = http.Server(app);
-const websocket = socketio(server, {pingTimeout: 30000});
+const websocket = socketio(server, {pingTimeout: 30000, path: '/socket.io'});
 
 const mongoPw = process.env.MONGO_PASSWORD;
 const mongoUser = process.env.MONGO_USER;
@@ -45,13 +45,19 @@ app.use(function(req, res, next) {
 app.use('/auth', require('./src/auth.js'));
 app.use('/chat', require('./src/chat.js'));
 app.use('/event', require('./src/event.js'));
-app.use('/swipe', require('./src/swipe.js'));
+app.use('/swipe', require('./src/swipe.js')(websocket));
 app.use('/user', require('./src/user.js'));
+
+var chatSocket = require('./src/chatSocket.js').onConnect;
+websocket.of('/chatNotification').on('connection', (socket) => {
+    chatSocket(socket, mongoConnection);
+});
+
+var matchSocket = require('./src/matchSocket.js').onConnect;
+websocket.of('/matchNotification').on('connection', (socket) => {
+    matchSocket(socket);
+});
 
 server.listen(3000, () => console.log('Server running on port 3000'));
 
-var onConnect = require('./src/chatSocket.js').onConnect;
 
-websocket.on('connection', (socket) => {
-    onConnect(socket, mongoConnection);
-});
