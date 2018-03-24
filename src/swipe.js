@@ -54,46 +54,27 @@ module.exports = function(websocket) {
     });
 
 
-    function createMatch(userId, swipeId, db){
-        db.collection('user').update({ _id: new ObjectID(userId) },
-            { $push: { matches: swipeId } }
+    function createMatch(user, swipe, db){
+        db.collection('user').update({ _id: new ObjectID(user._id) },
+            { $push: { matches: swipe._id } }
         ).catch((error) => {
             console.log(error);
         });
-        db.collection('user').update({ _id: new ObjectID(swipeId) },
-            { $push: { matches: userId } }
+        db.collection('user').update({ _id: new ObjectID(swipe._id) },
+            { $push: { matches: user._id } }
         ).catch((error) => {
             console.log(error);
         });
-        db.collection('user').aggregate([
-            {
-                "$match": {
-                    "_id": { "$in": [new ObjectID(userId), new ObjectID(swipeId)] }
-                }
-            }, {
-                "$group": {
-                    "_id": 0,
-                    "set1": { "$first": "$attending" },
-                    "set2": { "$last": "$attending" },
-                }
-            }, {
-                "$project": {
-                    "set1": 1,
-                    "set2": 1,
-                    "commonToBoth": { "$setIntersection": [ "$set1", "$set2" ] },
-                    "_id": 0
-                }
-            }
-        ]).toArray().then((result) => {
-            let commonEvents = result[0].commonToBoth.map(
-                (eventId) => new ObjectID(eventId)
-            );
-            return db.collection('event').find( {
-                "_id": {"$in": commonEvents},
-            }).toArray();
-        }).then((events) => {
+        let swipeEvents = new Set(swipe.attending);
+        let commonEvents = user.attending.filter(
+            event => swipeEvents.has(event)
+        ).map((eventId) => new ObjectID(eventId));
+        db.collection('event').find( {
+            "_id": {"$in": commonEvents},
+        }).toArray()
+        .then((events) => {
             db.collection('chat').insertOne({
-                userIds: [userId, swipeId],
+                userIds: [user._id, swipe._id],
                 messages: [{
                     _id: 1,
                     text: 'New Match!\nYou are both going to\n' + events
@@ -102,13 +83,20 @@ module.exports = function(websocket) {
                     system: true,
                 }]
             }).then(() => {
-                websocket.of('/matchNotification').to(swipeId).emit(
+                console.log('sending 1');
+                console.log(swipe._id);
+                websocket.of('/matchNotification').to(swipe._id).emit(
                     'newMatch', {
-                        test: 'hello world',
-                });
-                websocket.of('/matchNotification').to(userId).emit('newMatch', {
-                    test: 'hello world',
-                });
+                        match: user,
+                    }
+                );
+                console.log('sending 2');
+                console.log(user._id);
+                websocket.of('/matchNotification').to(user._id).emit(
+                    'newMatch', {
+                        match: swipe, 
+                    }
+                );
             });
         }).catch((error) => {
             console.log(error);
@@ -121,10 +109,7 @@ module.exports = function(websocket) {
             db.collection('user').findOne({ _id: new ObjectID(swipeId) })
             .then((swipe) => {
                 if(swipe.liked.includes(userId) && user.liked.includes(swipeId)){
-                    //TODO: send notifications of some kind
-                    
-                    createMatch(userId, swipeId, db);
-                } else {
+                    createMatch(user, swipe, db);
                 }
             }).catch((error) => {
                 console.log(error);
