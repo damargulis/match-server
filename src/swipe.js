@@ -65,17 +65,53 @@ module.exports = function(websocket) {
         ).catch((error) => {
             console.log(error);
         });
-        db.collection('chat').insertOne({
-            userIds: [userId, swipeId],
-            messages: [],
+        db.collection('user').aggregate([
+            {
+                "$match": {
+                    "_id": { "$in": [new ObjectID(userId), new ObjectID(swipeId)] }
+                }
+            }, {
+                "$group": {
+                    "_id": 0,
+                    "set1": { "$first": "$attending" },
+                    "set2": { "$last": "$attending" },
+                }
+            }, {
+                "$project": {
+                    "set1": 1,
+                    "set2": 1,
+                    "commonToBoth": { "$setIntersection": [ "$set1", "$set2" ] },
+                    "_id": 0
+                }
+            }
+        ]).toArray().then((result) => {
+            let commonEvents = result[0].commonToBoth.map(
+                (eventId) => new ObjectID(eventId)
+            );
+            return db.collection('event').find( {
+                "_id": {"$in": commonEvents},
+            }).toArray();
+        }).then((events) => {
+            db.collection('chat').insertOne({
+                userIds: [userId, swipeId],
+                messages: [{
+                    _id: 1,
+                    text: 'New Match!\nYou are both going to\n' + events
+                        .map(event => event.name)
+                        .join(',\n'),
+                    system: true,
+                }]
+            }).then(() => {
+                websocket.of('/matchNotification').to(swipeId).emit(
+                    'newMatch', {
+                        test: 'hello world',
+                });
+                websocket.of('/matchNotification').to(userId).emit('newMatch', {
+                    test: 'hello world',
+                });
+            });
         }).catch((error) => {
             console.log(error);
-        });
-        websocket.of('/matchNotification').to(swipeId).emit('newMatch', {
-            test: 'hello world',
-        });
-        websocket.of('/matchNotification').to(userId).emit('newMatch', {
-            test: 'hello world',
         });
     }
 
