@@ -7,10 +7,14 @@ module.exports = function(websocket) {
     function isEligable(user, test_id, db) {
         return db.collection('user').findOne({_id: new ObjectID(test_id)})
         .then((test_user) => {
-            if(test_user.age > user.interestsAgeMax || test_user.age < user.interestsAgeMin) {
+            if(test_user.age > user.interestsAgeMax 
+                || test_user.age < user.interestsAgeMin
+            ) {
                 return false;
             }
-            if(test_user.gender != user.interestsGender && user.interestsGender != 'Any'){
+            if(test_user.gender != user.interestsGender 
+                && user.interestsGender != 'Any'
+            ){
                 return false;
             }
             if(user.liked.includes(test_id) || user.disliked.includes(test_id)){
@@ -28,8 +32,8 @@ module.exports = function(websocket) {
             for(var i=0; i<user.attending.length; i++){
                 attendingEvents.push(new ObjectID(user.attending[i]));
             }
-            req.db.collection('event').find({ _id: { $in: attendingEvents } }).toArray()
-            .then((events) => {
+            req.db.collection('event').find({ _id: { $in: attendingEvents } })
+            .toArray().then((events) => {
                 let users = events.reduce((users, evt) => {
                     for(var i = 0; i<evt.attendees.length; i++){
                         if(evt.attendees[i] != req.params.id){
@@ -40,8 +44,9 @@ module.exports = function(websocket) {
                 }, new Set());
 
                 var usersArray = [...users];
-                Promise.all(usersArray.map(entry => isEligable(user, entry, req.db)))
-                .then(bits => usersArray.filter(entry => bits.shift()))
+                Promise.all(usersArray.map(
+                    entry => isEligable(user, entry, req.db))
+                ).then(bits => usersArray.filter(entry => bits.shift()))
                 .then((results) => {
                     res.send(JSON.stringify({
                         swipeDeck: results
@@ -83,15 +88,11 @@ module.exports = function(websocket) {
                     system: true,
                 }]
             }).then(() => {
-                console.log('sending 1');
-                console.log(swipe._id);
                 websocket.of('/matchNotification').to(swipe._id).emit(
                     'newMatch', {
                         match: user,
                     }
                 );
-                console.log('sending 2');
-                console.log(user._id);
                 websocket.of('/matchNotification').to(user._id).emit(
                     'newMatch', {
                         match: swipe, 
@@ -108,7 +109,9 @@ module.exports = function(websocket) {
         .then((user) => {
             db.collection('user').findOne({ _id: new ObjectID(swipeId) })
             .then((swipe) => {
-                if(swipe.liked.includes(userId) && user.liked.includes(swipeId)){
+                if(swipe.liked.includes(userId) 
+                    && user.liked.includes(swipeId)
+                ){
                     createMatch(user, swipe, db);
                 }
             }).catch((error) => {
@@ -121,7 +124,8 @@ module.exports = function(websocket) {
 
     router.post('/', (req, res) => {
         if(req.body.liked){
-            req.db.collection('user').update({ _id: new ObjectID(req.body.userId) },
+            req.db.collection('user').update(
+                { _id: new ObjectID(req.body.userId) },
                 { $push: { liked: req.body.swipeId }}
             ).then(() => {
                 checkMatch(req.body.userId, req.body.swipeId, req.db);
@@ -129,7 +133,8 @@ module.exports = function(websocket) {
                 console.log(error);
             });
         } else {
-            req.db.collection('user').update({ _id: new ObjectID(req.body.userId) },
+            req.db.collection('user').update(
+                { _id: new ObjectID(req.body.userId) },
                 { $push: { disliked: req.body.swipeId }}
             ).then(() => {
                 checkMatch(req.body.userId, req.body.swipeId, req.db);
