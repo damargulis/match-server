@@ -22,6 +22,13 @@ router.post('/login', (req, res) => {
 	});
 });
 
+router.post('/logout', (req, res) => {
+    //reset tokens and such
+    res.send(JSON.stringify({
+        success: true,
+    }));
+});
+
 router.post('/createAccount', (req, res) => {
 	req.db.collection('user').findOne({username: req.body.user.username})
 	.then((user) => {
