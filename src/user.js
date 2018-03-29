@@ -43,6 +43,18 @@ router.get('/photo/:id', (req, res) => {
     });
 });
 
+router.get('/:id/events', (req, res) => {
+    req.db.collection('user').findOne({_id: new ObjectID(req.params.id)})
+    .then((user) => {
+        let attending = user.attending.map((evt) => new ObjectID(evt));
+        req.db.collection('event').find({_id: { '$in': attending } })
+        .toArray().then((events) => {
+            res.send(JSON.stringify(events));
+        });
+    });
+});
+    
+
 router.get('/:id', (req, res) => {
 	req.db.collection('user').findOne({_id: new ObjectID(req.params.id)})
 	.then((user) => {
