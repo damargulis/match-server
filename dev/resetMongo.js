@@ -1,7 +1,10 @@
+const mongo = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
 
 const mongoPw = process.env.MONGO_PASSWORD;
 const mongoUser = process.env.MONGO_USER;
+const Grid = require('gridfs');
+const fs = require('fs');
 
 var passwordHash = require('password-hash');
 
@@ -10,6 +13,7 @@ const uri = 'mongodb://' + mongoUser + ':' + mongoPw + '@nativematch-shard-00-00
 function reset() {
 	let database = null;
 	let nativeMatch = null;
+    let gfs = null;
 	MongoClient.connect(uri)
 	.then((db) => {
 		database = db;
@@ -19,9 +23,9 @@ function reset() {
 	}).then(() => {
 		console.log('dropped');
 		nativeMatch = database.db('nativeMatch');
+        gfs = Grid(nativeMatch, mongo);
 		const user = nativeMatch.collection('user');
 		console.log('inserting test users');
-
 		return user.insertMany([
 			{
 				username: 'test',
@@ -234,8 +238,43 @@ function reset() {
         let event = nativeMatch.collection('event');
         return event.ensureIndex({ location: "2dsphere" })
     }).then(() => {
+        console.log('Adding User 1 Photo');
+        let file = fs.readFileSync('./stickman.png')
+        return new Promise(function(resolve, reject) {
+            let file = fs.readFileSync('./stickman.png')
+            gfs.writeFile({filename: 'test', mode: 'w', content_type: 'image'}, file, (err, file) => {
+                if(err) {
+                    reject(err);
+                } else {
+                    nativeMatch.collection('user').updateOne(
+                        {username: 'test'},
+                        { $push: {photos: file._id } }
+                    ).then(() => {
+                        resolve();
+                    });
+                }
+            });
+        });
+    }).then(() => {
+        console.log('Adding User 2 Photo');
+        return new Promise(function(resolve, reject) {
+            let file = fs.readFileSync('./stickwoman.jpg')
+            gfs.writeFile({filename: 'test', mode: 'w', content_type: 'image'}, file, (err, file) => {
+                if(err) {
+                    reject(err);
+                } else {
+                    nativeMatch.collection('user').updateOne(
+                        {username: 'test1'},
+                        { $push: {photos: file._id } }
+                    ).then(() => {
+                        resolve();
+                    });
+                }
+            });
+        });
+    }).then(() => {
 		console.log('finished');
-		database.close();
+        database.close();
 	}).catch((err) => {
 		console.log(err);
 	});
