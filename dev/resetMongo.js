@@ -1,3 +1,4 @@
+/*eslint-disable no-console*/
 const mongo = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
 
@@ -9,134 +10,137 @@ const path = require('path');
 
 var passwordHash = require('password-hash');
 
-const uri = 'mongodb://' + mongoUser + ':' + mongoPw + '@nativematch-shard-00-00-fvbif.mongodb.net:27017,nativematch-shard-00-01-fvbif.mongodb.net:27017,nativematch-shard-00-02-fvbif.mongodb.net:27017/test?ssl=true&replicaSet=nativeMatch-shard-0&authSource=admin';
+const uri = 'mongodb://' + mongoUser + ':' + mongoPw 
+    + '@nativematch-shard-00-00-fvbif.mongodb.net:27017,nativematch-shard-00-01'
+    + '-fvbif.mongodb.net:27017,nativematch-shard-00-02-fvbif.mongodb.net:27017'
+    + '/test?ssl=true&replicaSet=nativeMatch-shard-0&authSource=admin';
 
 function reset() {
-	let database = null;
-	let nativeMatch = null;
+    let database = null;
+    let nativeMatch = null;
     let gfs = null;
-	MongoClient.connect(uri)
-	.then((db) => {
-		database = db;
-		const oldDb = database.db('nativeMatch');
-		console.log('dropping old db');
-		return oldDb.dropDatabase();
-	}).then(() => {
-		console.log('dropped');
-		nativeMatch = database.db('nativeMatch');
+    MongoClient.connect(uri)
+    .then((db) => {
+        database = db;
+        const oldDb = database.db('nativeMatch');
+        console.log('dropping old db');
+        return oldDb.dropDatabase();
+    }).then(() => {
+        console.log('dropped');
+        nativeMatch = database.db('nativeMatch');
         gfs = Grid(nativeMatch, mongo);
-		const user = nativeMatch.collection('user');
-		console.log('inserting test users');
-		return user.insertMany([
-			{
-				username: 'test',
+        const user = nativeMatch.collection('user');
+        console.log('inserting test users');
+        return user.insertMany([
+            {
+                username: 'test',
                 password: passwordHash.generate('test'),
-				firstName: 'Dan',
-				age: 23,
-				gender: 'Male',
-				occupation: 'Software Engineer',
-				school: 'Washington University in St. Louis',
-				interestsGender: 'Female',
-				interestsDistance: 50,
-				interestsAgeMin: 20,
-				interestsAgeMax: 25,
+                firstName: 'Dan',
+                age: 23,
+                gender: 'Male',
+                occupation: 'Software Engineer',
+                school: 'Washington University in St. Louis',
+                interestsGender: 'Female',
+                interestsDistance: 50,
+                interestsAgeMin: 20,
+                interestsAgeMax: 25,
                 location: {
-                    type: "Point",
+                    type: 'Point',
                     coordinates: [
                         -90.295861,
                         38.650768,
                     ],
                 },
-				attending: [],
-				liked: [],
-				disliked: [],
+                attending: [],
+                liked: [],
+                disliked: [],
                 photos: [],
-			}, {
-				username: 'test1',
+            }, {
+                username: 'test1',
                 password: passwordHash.generate('test1'),
-				firstName: 'Jane',
-				age: 23,
-				gender: 'Female',
-				occupation: 'Designer',
-				school: 'St. Louis University',
-				interestsGender: 'Male',
-				interestsDistance: 50,
-				interestsAgeMin: 20,
-				interestsAgeMax: 25,
+                firstName: 'Jane',
+                age: 23,
+                gender: 'Female',
+                occupation: 'Designer',
+                school: 'St. Louis University',
+                interestsGender: 'Male',
+                interestsDistance: 50,
+                interestsAgeMin: 20,
+                interestsAgeMax: 25,
                 location: {
-                    type: "Point",
+                    type: 'Point',
                     coordinates: [
                         -90.295861,
                         36.650768,
                     ],
                 },
-				attending: [],
-				liked: [],
-				disliked: [],
+                attending: [],
+                liked: [],
+                disliked: [],
                 photos: [],
-			}
-		]);
-	}).then(() => {
-		const event = nativeMatch.collection('event');
-		console.log('inserting test events');
-		return event.insertMany([
-			{
-				type: 'Concert',
-				name: 'Kanye Concert',
-				location: {
-                    type: "Point",
+            }
+        ]);
+    }).then(() => {
+        const event = nativeMatch.collection('event');
+        console.log('inserting test events');
+        return event.insertMany([
+            {
+                type: 'Concert',
+                name: 'Kanye Concert',
+                location: {
+                    type: 'Point',
                     coordinates: [
                         -90.297881,
                         38.655606,
                     ]
-				},
-				address: {
-					street: '6161 Delmar Blvd',
-					city: 'St. Louis',
-					state: 'MO',
-					zip: '63112',
-				},
-				startTime: new Date('2018-10-10 20:00:00'),
-				endTime: new Date('2018-10-10 23:00:00'),
-				attendees: [],
-			}, {
-				type: 'Bar',
-				name: 'Half Price Drinks at Three Kings',
-				location: {
+                },
+                address: {
+                    street: '6161 Delmar Blvd',
+                    city: 'St. Louis',
+                    state: 'MO',
+                    zip: '63112',
+                },
+                startTime: new Date('2018-10-10 20:00:00'),
+                endTime: new Date('2018-10-10 23:00:00'),
+                attendees: [],
+            }, {
+                type: 'Bar',
+                name: 'Half Price Drinks at Three Kings',
+                location: {
                     type: 'Point',
                     coordinates: [
-					    -90.302944,
+                        -90.302944,
                         38.655918,
                     ]
-				},
-				address: {
-					street: '6307 Delmar Blvd',
-					city: 'St. Louis',
-					state: 'MO',
-					zip: '63130',
-				},
-				startTime: new Date('2018-10-10 22:00:00'),
-				endTime: new Date('2018-10-11 01:00:00'),
-				attendees: [],
-			}, {
-				type: 'Movie',
-				name: 'Black Panther',
-				location: {
+                },
+                address: {
+                    street: '6307 Delmar Blvd',
+                    city: 'St. Louis',
+                    state: 'MO',
+                    zip: '63130',
+                },
+                startTime: new Date('2018-10-10 22:00:00'),
+                endTime: new Date('2018-10-11 01:00:00'),
+                attendees: [],
+            }, {
+                type: 'Movie',
+                name: 'Black Panther',
+                location: {
                     type: 'Point',
                     coordinates: [
                         -90.316682,
                         38.634205,
                     ]
-				},
-				address: {
-					street: '6706 Clayton Rd.',
-					city: 'St. Louis',
-					state: 'MO',
-					zip: '63117',
-				},
-				startTime: new Date('2018-10-11 20:00:00'),
-				endTime: new Date('2018-10-11 22:00:00'),
-				attendees: [],
+                },
+                address: {
+                    street: '6706 Clayton Rd.',
+                    city: 'St. Louis',
+                    state: 'MO',
+                    zip: '63117',
+                },
+                startTime: new Date('2018-10-11 20:00:00'),
+                endTime: new Date('2018-10-11 22:00:00'),
+                attendees: [],
             }, {
                 type: 'Restaurant',
                 name: 'Cheap Dinner at Gamlin Whiskey House',
@@ -153,9 +157,9 @@ function reset() {
                     state: 'MO',
                     zip: '63108',
                 },
-				startTime: new Date('2018-10-09 17:00:00'),
-				endTime: new Date('2018-10-09 22:00:00'),
-				attendees: [],
+                startTime: new Date('2018-10-09 17:00:00'),
+                endTime: new Date('2018-10-09 22:00:00'),
+                attendees: [],
             }, {
                 type: 'Play',
                 name: 'Hamilton at Peabody Opera House',
@@ -168,9 +172,9 @@ function reset() {
                 },
                 address: {
                 },
-				startTime: new Date('2018-10-12 19:00:00'),
-				endTime: new Date('2018-10-12 22:00:00'),
-				attendees: [],
+                startTime: new Date('2018-10-12 19:00:00'),
+                endTime: new Date('2018-10-12 22:00:00'),
+                attendees: [],
             }, {
                 type: 'Sports',
                 name: 'Blues vs. Blackhawks',
@@ -187,9 +191,9 @@ function reset() {
                     state: 'MO',
                     zip: '63103',
                 },
-				startTime: new Date('2018-10-12 18:00:00'),
-				endTime: new Date('2018-10-12 22:00:00'),
-				attendees: [],
+                startTime: new Date('2018-10-12 18:00:00'),
+                endTime: new Date('2018-10-12 22:00:00'),
+                attendees: [],
             }, {
                 type: 'Museum',
                 name: 'St. Louis Art Museum Exhibt',
@@ -206,9 +210,9 @@ function reset() {
                     state: 'MO',
                     zip: '63110',
                 },
-				startTime: new Date('2018-10-12 08:00:00'),
-				endTime: new Date('2018-10-12 20:00:00'),
-				attendees: [],
+                startTime: new Date('2018-10-12 08:00:00'),
+                endTime: new Date('2018-10-12 20:00:00'),
+                attendees: [],
             }, {
                 type: 'Bar',
                 name: 'Trivia at Tiff\'s',
@@ -230,54 +234,65 @@ function reset() {
                 attendees: [],
             }
         ]);
-	}).then(() => {
+    }).then(() => {
         console.log('adding event location index');
         let user = nativeMatch.collection('user');
-        return user.ensureIndex({ location: "2dsphere" })
+        return user.ensureIndex({ location: '2dsphere' });
     }).then(() => {
-        console.log('adding event location index')
+        console.log('adding event location index');
         let event = nativeMatch.collection('event');
-        return event.ensureIndex({ location: "2dsphere" })
+        return event.ensureIndex({ location: '2dsphere' });
     }).then(() => {
         console.log('Adding User 1 Photo');
         return new Promise(function(resolve, reject) {
-            let file = fs.readFileSync(path.resolve(__dirname, './stickman.png'));
-            gfs.writeFile({filename: 'test', mode: 'w', content_type: 'image'}, file, (err, file) => {
-                if(err) {
-                    reject(err);
-                } else {
-                    nativeMatch.collection('user').updateOne(
-                        {username: 'test'},
-                        { $push: {photos: file._id } }
-                    ).then(() => {
-                        resolve();
-                    });
-                }
-            });
+            let file = fs.readFileSync(
+                path.resolve(__dirname, './stickman.png')
+            );
+            gfs.writeFile(
+                {filename: 'test', mode: 'w', content_type: 'image'}, 
+                file, 
+                (err, file) => {
+                    if(err) {
+                        reject(err);
+                    } else {
+                        nativeMatch.collection('user').updateOne(
+                            {username: 'test'},
+                            { $push: {photos: file._id } }
+                        ).then(() => {
+                            resolve();
+                        });
+                    }
+                });
         });
     }).then(() => {
         console.log('Adding User 2 Photo');
         return new Promise(function(resolve, reject) {
-            let file = fs.readFileSync(path.resolve(__dirname, './stickwoman.jpg'));
-            gfs.writeFile({filename: 'test', mode: 'w', content_type: 'image'}, file, (err, file) => {
-                if(err) {
-                    reject(err);
-                } else {
-                    nativeMatch.collection('user').updateOne(
-                        {username: 'test1'},
-                        { $push: {photos: file._id } }
-                    ).then(() => {
-                        resolve();
-                    });
-                }
-            });
+            let file = fs.readFileSync(
+                path.resolve(__dirname, './stickwoman.jpg')
+            );
+            gfs.writeFile(
+                {filename: 'test', mode: 'w', content_type: 'image'},
+                file,
+                (err, file) => {
+                    if(err) {
+                        reject(err);
+                    } else {
+                        nativeMatch.collection('user').updateOne(
+                            {username: 'test1'},
+                            { $push: {photos: file._id } }
+                        ).then(() => {
+                            resolve();
+                        });
+                    }
+                });
         });
     }).then(() => {
-		console.log('finished');
+        console.log('finished');
         database.close();
-	}).catch((err) => {
-		console.log(err);
-	});
+    }).catch((err) => {
+        console.log(err);
+    });
 }
 
 reset();	
+/*eslint-enable no-console*/

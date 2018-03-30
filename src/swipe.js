@@ -46,14 +46,12 @@ module.exports = function(websocket) {
                 var usersArray = [...users];
                 Promise.all(usersArray.map(
                     entry => isEligable(user, entry, req.db))
-                ).then(bits => usersArray.filter(entry => bits.shift()))
+                ).then(bits => usersArray.filter(() => bits.shift()))
                 .then((results) => {
                     res.send(JSON.stringify({
                         swipeDeck: results
                     }));
                 });	
-            }).catch((error) => {
-                console.log(error);
             });
         });
     });
@@ -62,20 +60,16 @@ module.exports = function(websocket) {
     function createMatch(user, swipe, db){
         db.collection('user').update({ _id: new ObjectID(user._id) },
             { $push: { matches: swipe._id } }
-        ).catch((error) => {
-            console.log(error);
-        });
+        );
         db.collection('user').update({ _id: new ObjectID(swipe._id) },
             { $push: { matches: user._id } }
-        ).catch((error) => {
-            console.log(error);
-        });
+        );
         let swipeEvents = new Set(swipe.attending);
         let commonEvents = user.attending.filter(
             event => swipeEvents.has(event)
         ).map((eventId) => new ObjectID(eventId));
         db.collection('event').find( {
-            "_id": {"$in": commonEvents},
+            '_id': {'$in': commonEvents},
         }).toArray()
         .then((events) => {
             db.collection('chat').insertOne({
@@ -83,8 +77,8 @@ module.exports = function(websocket) {
                 messages: [{
                     _id: 1,
                     text: 'New Match!\nYou are both going to\n' + events
-                        .map(event => event.name)
-                        .join(',\n'),
+                    .map(event => event.name)
+                    .join(',\n'),
                     system: true,
                     createdAt: Date.now()
                 }]
@@ -100,8 +94,6 @@ module.exports = function(websocket) {
                     }
                 );
             });
-        }).catch((error) => {
-            console.log(error);
         });
     }
 
@@ -115,11 +107,7 @@ module.exports = function(websocket) {
                 ){
                     createMatch(user, swipe, db);
                 }
-            }).catch((error) => {
-                console.log(error);
             });
-        }).catch((error) => {
-            console.log(error);
         });
     }
 
@@ -130,8 +118,6 @@ module.exports = function(websocket) {
                 { $push: { liked: req.body.swipeId }}
             ).then(() => {
                 checkMatch(req.body.userId, req.body.swipeId, req.db);
-            }).catch((error) => {
-                console.log(error);
             });
         } else {
             req.db.collection('user').update(
@@ -139,11 +125,9 @@ module.exports = function(websocket) {
                 { $push: { disliked: req.body.swipeId }}
             ).then(() => {
                 checkMatch(req.body.userId, req.body.swipeId, req.db);
-            }).catch((error) => {
-                console.log(error);
             });
         }
         res.send({ success: true });
     });
     return router;
-}
+};
