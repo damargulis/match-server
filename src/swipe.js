@@ -86,6 +86,7 @@ module.exports = function(websocket) {
                         .map(event => event.name)
                         .join(',\n'),
                     system: true,
+                    createdAt: Date.now()
                 }]
             }).then(() => {
                 websocket.of('/matchNotification').to(swipe._id).emit(
