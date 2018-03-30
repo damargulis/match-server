@@ -5,6 +5,7 @@ const mongoPw = process.env.MONGO_PASSWORD;
 const mongoUser = process.env.MONGO_USER;
 const Grid = require('gridfs');
 const fs = require('fs');
+const path = require('path');
 
 var passwordHash = require('password-hash');
 
@@ -239,9 +240,8 @@ function reset() {
         return event.ensureIndex({ location: "2dsphere" })
     }).then(() => {
         console.log('Adding User 1 Photo');
-        let file = fs.readFileSync('./stickman.png')
         return new Promise(function(resolve, reject) {
-            let file = fs.readFileSync('./stickman.png')
+            let file = fs.readFileSync(path.resolve(__dirname, './stickman.png'));
             gfs.writeFile({filename: 'test', mode: 'w', content_type: 'image'}, file, (err, file) => {
                 if(err) {
                     reject(err);
@@ -258,7 +258,7 @@ function reset() {
     }).then(() => {
         console.log('Adding User 2 Photo');
         return new Promise(function(resolve, reject) {
-            let file = fs.readFileSync('./stickwoman.jpg')
+            let file = fs.readFileSync(path.resolve(__dirname, './stickwoman.jpg'));
             gfs.writeFile({filename: 'test', mode: 'w', content_type: 'image'}, file, (err, file) => {
                 if(err) {
                     reject(err);
