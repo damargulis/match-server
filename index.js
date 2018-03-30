@@ -5,8 +5,6 @@ const http = require('http');
 const bodyParser = require('body-parser');
 const socketio = require('socket.io');
 
-const bad = "really lngaosdfn aklajsdf ;lakdfj lakwejf alksdjf alksdfj alksjefelkafj salkjdf "
-
 const mongo = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
 const Grid = require('gridfs');
