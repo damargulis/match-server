@@ -1,4 +1,3 @@
-/*eslint-disable no-console*/
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const http = require('http');
@@ -26,7 +25,10 @@ app.use(bodyParser.json());
 app.use(fileUpload());
 
 app.use('/', (req, res, next) => {
+
+    /*eslint-disable no-console*/
     console.log(req.originalUrl);
+    /*eslint-enable no-console*/
     next();
 });
 
@@ -35,7 +37,9 @@ var gfs;
 MongoClient.connect(uri, function(err, client) {
     mongoConnection = client.db('nativeMatch');
     gfs = Grid(mongoConnection, mongo);
+    /*eslint-disable no-console*/
     console.log('Database connected');
+    /*eslint-enable no-console*/
 });
 
 app.use(function(req, res, next) {
@@ -60,5 +64,6 @@ websocket.of('/matchNotification').on('connection', (socket) => {
     matchSocket(socket);
 });
 
+/*eslint-disable no-console*/
 server.listen(3000, () => console.log('Server running on port 3000'));
 /*eslint-enable no-console*/
