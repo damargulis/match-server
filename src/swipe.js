@@ -49,7 +49,7 @@ module.exports = function(websocket) {
                 ).then(bits => usersArray.filter(() => bits.shift()))
                 .then((results) => {
                     res.send(JSON.stringify({
-                        swipeDeck: results
+                        swipeDeck: results,
                     }));
                 });	
             });
@@ -80,8 +80,8 @@ module.exports = function(websocket) {
                     .map(event => event.name)
                     .join(',\n'),
                     system: true,
-                    createdAt: Date.now()
-                }]
+                    createdAt: Date.now(),
+                }],
             }).then(() => {
                 websocket.of('/matchNotification').to(swipe._id).emit(
                     'newMatch', {

@@ -11,7 +11,7 @@ router.post('/login', (req, res) => {
             res.send(JSON.stringify({
                 success: true,
                 userId: user._id,
-                user: user
+                user: user,
             }));
         } else {
             res.send(JSON.stringify({
@@ -63,7 +63,7 @@ router.post('/createAccount', (req, res) => {
         res.send(JSON.stringify({
             success: true,
             userId: user._id,
-            user: user
+            user: user,
         }));	
     }).catch((error) => {
         const message = error instanceof UserError ? 

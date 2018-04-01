@@ -78,7 +78,7 @@ function reset() {
                 liked: [],
                 disliked: [],
                 photos: [],
-            }
+            },
         ]);
     }).then(() => {
         const event = nativeMatch.collection('event');
@@ -99,7 +99,7 @@ function reset() {
                     coordinates: [
                         -90.297881,
                         38.655606,
-                    ]
+                    ],
                 },
                 address: {
                     street: '6161 Delmar Blvd',
@@ -118,7 +118,7 @@ function reset() {
                     coordinates: [
                         -90.302944,
                         38.655918,
-                    ]
+                    ],
                 },
                 address: {
                     street: '6307 Delmar Blvd',
@@ -137,7 +137,7 @@ function reset() {
                     coordinates: [
                         -90.316682,
                         38.634205,
-                    ]
+                    ],
                 },
                 address: {
                     street: '6706 Clayton Rd.',
@@ -156,7 +156,7 @@ function reset() {
                     coordinates: [
                         -90.261456,
                         38.644545,
-                    ]
+                    ],
                 },
                 address: {
                     street: '236 N Euclid Ave',
@@ -175,7 +175,7 @@ function reset() {
                     coordinates: [
                         -90.201804,
                         38.627865,
-                    ]
+                    ],
                 },
                 address: {
                 },
@@ -190,7 +190,7 @@ function reset() {
                     coordinates: [
                         -90.202684,
                         38.626842,
-                    ]
+                    ],
                 },
                 address: {
                     street: '1401 Clark Ave',
@@ -209,7 +209,7 @@ function reset() {
                     coordinates: [
                         -90.294953,
                         38.639095,
-                    ]
+                    ],
                 },
                 address: {
                     street: '1 Fine Arts Dr',
@@ -228,7 +228,7 @@ function reset() {
                     coordinates: [
                         -74.329924,
                         40.859700,
-                    ]
+                    ],
                 },
                 address: {
                     street: '73 Bloomfield Ave',
@@ -239,7 +239,7 @@ function reset() {
                 startTime: new Date((new Date(today)).setHours(21)),
                 endTime: new Date((new Date(today)).setHours(23)),
                 attendees: [],
-            }
+            },
         ]);
     }).then(() => {
         console.log('adding user location index');

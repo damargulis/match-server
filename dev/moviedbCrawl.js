@@ -23,9 +23,9 @@ function crawlRequest(url, query={}, results=[], max_pages=null){
         uri: url,
         qs: query,
         headers: {
-            'User-Agent': 'Request-Promise'
+            'User-Agent': 'Request-Promise',
         },
-        json: true
+        json: true,
     };
     return rp(options)
     .then((response) => {
@@ -75,7 +75,7 @@ crawlRequest(BASE_URL + 'movie/upcoming', {language: 'en-US'})
                 startTime: startTime,
                 endTime: endTime,
             }, {
-                upsert: true
+                upsert: true,
             }
             );
         })).then(() => {
@@ -83,11 +83,11 @@ crawlRequest(BASE_URL + 'movie/upcoming', {language: 'en-US'})
             return db.db('nativeMatch').collection('event').updateMany({
                 attendees: {
                     $exists: false,
-                }
+                },
             }, {
                 $set: {
-                    'attendees': []
-                }
+                    'attendees': [],
+                },
             });
         }).then(() => {
             db.close();

@@ -32,7 +32,7 @@ router.post('/:id/photos', (req, res) => {
 router.get('/photo/:id', (req, res) => {
     req.gfs.readFile({_id: new ObjectID(req.params.id)}, (err, data) => {
         res.send(JSON.stringify({
-            data: data
+            data: data,
         }));
     });
 });

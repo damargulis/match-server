@@ -8,5 +8,5 @@ var onConnect = (socket) => {
 };
 
 module.exports = {
-    onConnect: onConnect
+    onConnect: onConnect,
 };
