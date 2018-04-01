@@ -8,14 +8,14 @@ const BASE_URL = 'https://api.themoviedb.org/3/';
 
 var rp = require('request-promise');
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 const uri = 'mongodb://' + mongoUser + ':' + mongoPw
     + '@nativematch-shard-00-00-fvbif.mongodb.net:27017,nativematch-shard-00-01'
     + '-fvbif.mongodb.net:27017,nativematch-shard-00-02-fvbif.mongodb.net:27017'
     + '/test?ssl=true&replicaSet=nativeMatch-shard-0&authSource=admin';
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 function crawlRequest(url, query={}, results=[], max_pages=null){
     query.api_key = API_KEY;
@@ -43,12 +43,14 @@ function crawlRequest(url, query={}, results=[], max_pages=null){
         }
     }).catch((error) => {
         if(error.statusCode == 429){
+            console.log('Rate Limited');
             return sleep(10000).then(() => {
                 return crawlRequest(url, query, results, max_pages);
             });
         }
         else {
             console.log(error);
+            throw error;
         }
     });
 }
@@ -76,8 +78,7 @@ crawlRequest(BASE_URL + 'movie/upcoming', {language: 'en-US'})
                 endTime: endTime,
             }, {
                 upsert: true,
-            }
-            );
+            });
         })).then(() => {
             console.log('Setting attending');
             return db.db('nativeMatch').collection('event').updateMany({
