@@ -7,7 +7,7 @@ router.get('/rsvp', (req, res) => {
     req.db.collection('event').findOne({_id: new ObjectID(req.query.eventId)})
     .then((evt) => {
         res.send(JSON.stringify({
-            attending: (evt.attendees.indexOf(req.query.userId) > -1)
+            attending: (evt.attendees.indexOf(req.query.userId) > -1),
         }));
     });
 });
@@ -40,6 +40,7 @@ router.get('/:id', (req, res) => {
 });
 
 router.get('/', (req, res) => {
+    let queryTime = req.afterTime ? new Date(req.afterTime) : new Date();
     Promise.all([
         req.db.collection('event').find({
             location: {
@@ -52,18 +53,26 @@ router.get('/', (req, res) => {
                         ],
                     },
                     $maxDistance: parseInt(req.query.maxDist) * 1609.344,
-                }
-            }
-        }).toArray(),
+                },
+            },
+        }).toArray().then((events) => {
+            return events.filter((event) => {
+                return event.endTime > queryTime;
+            });
+        }), 
         req.db.collection('event').find({
-            location: {
-                $exists: false
-            }
+            $and: [{
+                location: {
+                    $exists: false,
+                },
+            }, {
+                endTime: {
+                    $gt: queryTime,
+                },
+            }],
         }).toArray(),
     ]).then((results) => {
-        return [].concat.apply([], results).filter((event) => {
-            return event.endTime > Date.now();
-        });
+        return [].concat.apply([], results);
     }).then((results) => {
         res.send(JSON.stringify(results));
     });
