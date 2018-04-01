@@ -4,7 +4,7 @@ const MongoClient = require('mongodb').MongoClient;
 const mongoPw = process.env.MONGO_PASSWORD;
 const mongoUser = process.env.MONGO_USER;
 const API_KEY = process.env.EVENTBRITE_API_KEY;
-const BASE_URL = 'https://www.eventbriteapi.com/v3/'
+const BASE_URL = 'https://www.eventbriteapi.com/v3/';
 
 var rp = require('request-promise');
 
@@ -88,7 +88,7 @@ crawlRequest(BASE_URL + '/categories', 'categories', {
             console.log('upserting events');
             Promise.all(events.map((event) => {
                 return db.db('nativeMatch').collection('event').update({
-                    eventbriteId: event.id
+                    eventbriteId: event.id,
                 }, {
                     type: event.category.name,
                     eventbriteId: event.id,
@@ -108,7 +108,7 @@ crawlRequest(BASE_URL + '/categories', 'categories', {
                         city: event.venue.city,
                         state: event.venue.region,
                         zip: event.venue.postal_code,
-                    }
+                    },
                 }, {upsert: true});
             })).then(() => {
                 console.log('Setting attending');
