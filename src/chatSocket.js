@@ -20,5 +20,5 @@ var onConnect = (socket, mongoConnection) => {
 };
 
 module.exports = {
-    onConnect: onConnect
+    onConnect: onConnect,
 };

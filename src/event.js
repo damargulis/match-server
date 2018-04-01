@@ -7,7 +7,7 @@ router.get('/rsvp', (req, res) => {
     req.db.collection('event').findOne({_id: new ObjectID(req.query.eventId)})
     .then((evt) => {
         res.send(JSON.stringify({
-            attending: (evt.attendees.indexOf(req.query.userId) > -1)
+            attending: (evt.attendees.indexOf(req.query.userId) > -1),
         }));
     });
 });
@@ -40,24 +40,45 @@ router.get('/:id', (req, res) => {
 });
 
 router.get('/', (req, res) => {
-    req.db.collection('event').find({
-        location: {
-            $near: {
-                $geometry: {
-                    type: 'Point',
-                    coordinates: [
-                        parseFloat(req.query.long),
-                        parseFloat(req.query.lat),
-                    ],
+    let queryTime = req.query.afterTime ? 
+        new Date(req.query.afterTime) : new Date();
+    let maxEvents = req.query.maxEvents ? req.query.maxEvents : 25;
+    Promise.all([
+        req.db.collection('event').find({
+            location: {
+                $near: {
+                    $geometry: {
+                        type: 'Point',
+                        coordinates: [
+                            parseFloat(req.query.long),
+                            parseFloat(req.query.lat),
+                        ],
+                    },
+                    $maxDistance: parseInt(req.query.maxDist) * 1609.344,
                 },
-                // convert to meters
-                $maxDistance: parseInt(req.query.maxDist) * 1609.344,
-            }
-        }
-    }, {sort: ['startTime', 'endTime']})
-    .toArray()
-    .then((events) => {
-        res.send(JSON.stringify(events));
+            },
+        }, { sort: ['startTime', 'endTime'] })
+        .toArray().then((events) => {
+            return events.filter((event) => {
+                return event.startTime > queryTime;
+            });
+        }), 
+        req.db.collection('event').find({
+            $and: [{
+                location: {
+                    $exists: false,
+                },
+            }, {
+                startTime: {
+                    $gt: queryTime,
+                },
+            }],
+        }, { sort: ['startTime', 'endTime'] }).limit(maxEvents)
+        .toArray(),
+    ]).then((results) => {
+        return [].concat.apply([], results).slice(0,maxEvents);
+    }).then((results) => {
+        res.send(JSON.stringify(results));
     });
 });
 

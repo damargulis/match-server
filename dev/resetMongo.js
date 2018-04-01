@@ -78,11 +78,18 @@ function reset() {
                 liked: [],
                 disliked: [],
                 photos: [],
-            }
+            },
         ]);
     }).then(() => {
         const event = nativeMatch.collection('event');
         console.log('inserting test events');
+        const today = new Date();
+        today.setHours(0);
+        today.setMinutes(0);
+        today.setSeconds(0);
+        today.setMilliseconds(0);
+        const tomorrow = new Date(today.getTime() + 1 * 24 * 60 * 60 * 1000);
+        const dayAfter = new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000);
         return event.insertMany([
             {
                 type: 'Concert',
@@ -92,7 +99,7 @@ function reset() {
                     coordinates: [
                         -90.297881,
                         38.655606,
-                    ]
+                    ],
                 },
                 address: {
                     street: '6161 Delmar Blvd',
@@ -100,8 +107,8 @@ function reset() {
                     state: 'MO',
                     zip: '63112',
                 },
-                startTime: new Date('2018-10-10 20:00:00'),
-                endTime: new Date('2018-10-10 23:00:00'),
+                startTime: new Date((new Date(dayAfter)).setHours(20)),
+                endTime: new Date((new Date(dayAfter)).setHours(23)),
                 attendees: [],
             }, {
                 type: 'Bar',
@@ -111,7 +118,7 @@ function reset() {
                     coordinates: [
                         -90.302944,
                         38.655918,
-                    ]
+                    ],
                 },
                 address: {
                     street: '6307 Delmar Blvd',
@@ -119,18 +126,18 @@ function reset() {
                     state: 'MO',
                     zip: '63130',
                 },
-                startTime: new Date('2018-10-10 22:00:00'),
-                endTime: new Date('2018-10-11 01:00:00'),
+                startTime: new Date((new Date(today)).setHours(21)),
+                endTime: new Date((new Date(today)).setHours(23)),
                 attendees: [],
             }, {
                 type: 'Movie',
-                name: 'Black Panther',
+                name: 'Special Local Showing of The Room',
                 location: {
                     type: 'Point',
                     coordinates: [
                         -90.316682,
                         38.634205,
-                    ]
+                    ],
                 },
                 address: {
                     street: '6706 Clayton Rd.',
@@ -138,8 +145,8 @@ function reset() {
                     state: 'MO',
                     zip: '63117',
                 },
-                startTime: new Date('2018-10-11 20:00:00'),
-                endTime: new Date('2018-10-11 22:00:00'),
+                startTime: new Date((new Date(tomorrow)).setHours(18)),
+                endTime: new Date((new Date(tomorrow)).setHours(20)),
                 attendees: [],
             }, {
                 type: 'Restaurant',
@@ -149,7 +156,7 @@ function reset() {
                     coordinates: [
                         -90.261456,
                         38.644545,
-                    ]
+                    ],
                 },
                 address: {
                     street: '236 N Euclid Ave',
@@ -157,8 +164,8 @@ function reset() {
                     state: 'MO',
                     zip: '63108',
                 },
-                startTime: new Date('2018-10-09 17:00:00'),
-                endTime: new Date('2018-10-09 22:00:00'),
+                startTime: new Date((new Date(dayAfter)).setHours(17)),
+                endTime: new Date((new Date(dayAfter)).setHours(22)),
                 attendees: [],
             }, {
                 type: 'Play',
@@ -168,12 +175,12 @@ function reset() {
                     coordinates: [
                         -90.201804,
                         38.627865,
-                    ]
+                    ],
                 },
                 address: {
                 },
-                startTime: new Date('2018-10-12 19:00:00'),
-                endTime: new Date('2018-10-12 22:00:00'),
+                startTime: new Date((new Date(today)).setHours(14)),
+                endTime: new Date((new Date(today)).setHours(18)),
                 attendees: [],
             }, {
                 type: 'Sports',
@@ -183,7 +190,7 @@ function reset() {
                     coordinates: [
                         -90.202684,
                         38.626842,
-                    ]
+                    ],
                 },
                 address: {
                     street: '1401 Clark Ave',
@@ -191,8 +198,8 @@ function reset() {
                     state: 'MO',
                     zip: '63103',
                 },
-                startTime: new Date('2018-10-12 18:00:00'),
-                endTime: new Date('2018-10-12 22:00:00'),
+                startTime: new Date((new Date(tomorrow)).setHours(18)),
+                endTime: new Date((new Date(tomorrow)).setHours(22)),
                 attendees: [],
             }, {
                 type: 'Museum',
@@ -202,7 +209,7 @@ function reset() {
                     coordinates: [
                         -90.294953,
                         38.639095,
-                    ]
+                    ],
                 },
                 address: {
                     street: '1 Fine Arts Dr',
@@ -210,8 +217,8 @@ function reset() {
                     state: 'MO',
                     zip: '63110',
                 },
-                startTime: new Date('2018-10-12 08:00:00'),
-                endTime: new Date('2018-10-12 20:00:00'),
+                startTime: new Date((new Date(dayAfter)).setHours(8)),
+                endTime: new Date((new Date(dayAfter)).setHours(18)),
                 attendees: [],
             }, {
                 type: 'Bar',
@@ -221,7 +228,7 @@ function reset() {
                     coordinates: [
                         -74.329924,
                         40.859700,
-                    ]
+                    ],
                 },
                 address: {
                     street: '73 Bloomfield Ave',
@@ -229,19 +236,23 @@ function reset() {
                     state: 'NJ',
                     zip: '07058',
                 },
-                startTime: new Date('2018-10-15 19:00:00'),
-                endTime: new Date('2018-10-15 21:00:00'),
+                startTime: new Date((new Date(today)).setHours(21)),
+                endTime: new Date((new Date(today)).setHours(23)),
                 attendees: [],
-            }
+            },
         ]);
     }).then(() => {
-        console.log('adding event location index');
+        console.log('adding user location index');
         let user = nativeMatch.collection('user');
         return user.ensureIndex({ location: '2dsphere' });
     }).then(() => {
         console.log('adding event location index');
         let event = nativeMatch.collection('event');
-        return event.ensureIndex({ location: '2dsphere' });
+        return event.ensureIndex({ location: '2dsphere' }, {sparse: true});
+    }).then(() => {
+        console.log('adding event movieid index');
+        let event = nativeMatch.collection('event');
+        return event.ensureIndex({ moviedbId: 1}, {unique: true, sparse: true});
     }).then(() => {
         console.log('Adding User 1 Photo');
         return new Promise(function(resolve, reject) {

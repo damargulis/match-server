@@ -56,11 +56,17 @@ app.use('/user', require('./src/user.js'));
 
 var chatSocket = require('./src/chatSocket.js').onConnect;
 websocket.of('/chatNotification').on('connection', (socket) => {
+    /*eslint-disable no-console*/
+    console.log('/chatNotification');
+    /*eslint-enable no-console*/
     chatSocket(socket, mongoConnection);
 });
 
 var matchSocket = require('./src/matchSocket.js').onConnect;
 websocket.of('/matchNotification').on('connection', (socket) => {
+    /*eslint-disable no-console*/
+    console.log('/matchNotifaction');
+    /*eslint-enable no-console*/
     matchSocket(socket);
 });
 
