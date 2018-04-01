@@ -40,24 +40,32 @@ router.get('/:id', (req, res) => {
 });
 
 router.get('/', (req, res) => {
-    req.db.collection('event').find({
-        location: {
-            $near: {
-                $geometry: {
-                    type: 'Point',
-                    coordinates: [
-                        parseFloat(req.query.long),
-                        parseFloat(req.query.lat),
-                    ],
-                },
-                // convert to meters
-                $maxDistance: parseInt(req.query.maxDist) * 1609.344,
+    Promise.all([
+        req.db.collection('event').find({
+            location: {
+                $near: {
+                    $geometry: {
+                        type: 'Point',
+                        coordinates: [
+                            parseFloat(req.query.long),
+                            parseFloat(req.query.lat),
+                        ],
+                    },
+                    $maxDistance: parseInt(req.query.maxDist) * 1609.344,
+                }
             }
-        }
-    }, {sort: ['startTime', 'endTime']})
-    .toArray()
-    .then((events) => {
-        res.send(JSON.stringify(events));
+        }).toArray(),
+        req.db.collection('event').find({
+            location: {
+                $exists: false
+            }
+        }).toArray(),
+    ]).then((results) => {
+        return [].concat.apply([], results).filter((event) => {
+            return event.endTime > Date.now();
+        });
+    }).then((results) => {
+        res.send(JSON.stringify(results));
     });
 });
 

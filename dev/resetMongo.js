@@ -83,6 +83,13 @@ function reset() {
     }).then(() => {
         const event = nativeMatch.collection('event');
         console.log('inserting test events');
+        const today = new Date();
+        today.setHours(0);
+        today.setMinutes(0);
+        today.setSeconds(0);
+        today.setMilliseconds(0);
+        const tomorrow = new Date(today.getTime() + 1 * 24 * 60 * 60 * 1000);
+        const dayAfter = new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000);
         return event.insertMany([
             {
                 type: 'Concert',
@@ -100,8 +107,8 @@ function reset() {
                     state: 'MO',
                     zip: '63112',
                 },
-                startTime: new Date('2018-10-10 20:00:00'),
-                endTime: new Date('2018-10-10 23:00:00'),
+                startTime: new Date((new Date(dayAfter)).setHours(20)),
+                endTime: new Date((new Date(dayAfter)).setHours(23)),
                 attendees: [],
             }, {
                 type: 'Bar',
@@ -119,12 +126,12 @@ function reset() {
                     state: 'MO',
                     zip: '63130',
                 },
-                startTime: new Date('2018-10-10 22:00:00'),
-                endTime: new Date('2018-10-11 01:00:00'),
+                startTime: new Date((new Date(today)).setHours(21)),
+                endTime: new Date((new Date(today)).setHours(23)),
                 attendees: [],
             }, {
                 type: 'Movie',
-                name: 'Black Panther',
+                name: 'Special Local Showing of The Room',
                 location: {
                     type: 'Point',
                     coordinates: [
@@ -138,8 +145,8 @@ function reset() {
                     state: 'MO',
                     zip: '63117',
                 },
-                startTime: new Date('2018-10-11 20:00:00'),
-                endTime: new Date('2018-10-11 22:00:00'),
+                startTime: new Date((new Date(tomorrow)).setHours(18)),
+                endTime: new Date((new Date(tomorrow)).setHours(20)),
                 attendees: [],
             }, {
                 type: 'Restaurant',
@@ -157,8 +164,8 @@ function reset() {
                     state: 'MO',
                     zip: '63108',
                 },
-                startTime: new Date('2018-10-09 17:00:00'),
-                endTime: new Date('2018-10-09 22:00:00'),
+                startTime: new Date((new Date(dayAfter)).setHours(17)),
+                endTime: new Date((new Date(dayAfter)).setHours(22)),
                 attendees: [],
             }, {
                 type: 'Play',
@@ -172,8 +179,8 @@ function reset() {
                 },
                 address: {
                 },
-                startTime: new Date('2018-10-12 19:00:00'),
-                endTime: new Date('2018-10-12 22:00:00'),
+                startTime: new Date((new Date(today)).setHours(14)),
+                endTime: new Date((new Date(today)).setHours(18)),
                 attendees: [],
             }, {
                 type: 'Sports',
@@ -191,8 +198,8 @@ function reset() {
                     state: 'MO',
                     zip: '63103',
                 },
-                startTime: new Date('2018-10-12 18:00:00'),
-                endTime: new Date('2018-10-12 22:00:00'),
+                startTime: new Date((new Date(tomorrow)).setHours(18)),
+                endTime: new Date((new Date(tomorrow)).setHours(22)),
                 attendees: [],
             }, {
                 type: 'Museum',
@@ -210,8 +217,8 @@ function reset() {
                     state: 'MO',
                     zip: '63110',
                 },
-                startTime: new Date('2018-10-12 08:00:00'),
-                endTime: new Date('2018-10-12 20:00:00'),
+                startTime: new Date((new Date(dayAfter)).setHours(8)),
+                endTime: new Date((new Date(dayAfter)).setHours(18)),
                 attendees: [],
             }, {
                 type: 'Bar',
@@ -229,19 +236,23 @@ function reset() {
                     state: 'NJ',
                     zip: '07058',
                 },
-                startTime: new Date('2018-10-15 19:00:00'),
-                endTime: new Date('2018-10-15 21:00:00'),
+                startTime: new Date((new Date(today)).setHours(21)),
+                endTime: new Date((new Date(today)).setHours(23)),
                 attendees: [],
             }
         ]);
     }).then(() => {
-        console.log('adding event location index');
+        console.log('adding user location index');
         let user = nativeMatch.collection('user');
         return user.ensureIndex({ location: '2dsphere' });
     }).then(() => {
         console.log('adding event location index');
         let event = nativeMatch.collection('event');
-        return event.ensureIndex({ location: '2dsphere' });
+        return event.ensureIndex({ location: '2dsphere' }, {sparse: true});
+    }).then(() => {
+        console.log('adding event movieid index');
+        let event = nativeMatch.collection('event');
+        return event.ensureIndex({ moviedbId: 1}, {unique: true, sparse: true});
     }).then(() => {
         console.log('Adding User 1 Photo');
         return new Promise(function(resolve, reject) {
