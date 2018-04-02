@@ -35,8 +35,8 @@ function crawlRequest(url, query={}, results=[], max_pages=null){
         } else {
             query.page = response.page + 1;
             return crawlRequest(
-                url, 
-                query, 
+                url,
+                query,
                 results.concat(response.results),
                 max_pages
             );
@@ -47,8 +47,7 @@ function crawlRequest(url, query={}, results=[], max_pages=null){
             return sleep(10000).then(() => {
                 return crawlRequest(url, query, results, max_pages);
             });
-        }
-        else {
+        } else {
             console.log(error);
             throw error;
         }
@@ -62,11 +61,10 @@ crawlRequest(BASE_URL + 'movie/upcoming', {language: 'en-US'})
 
     MongoClient.connect(uri)
     .then((db) => {
-
         console.log('upserting movies');
         Promise.all(response.map((movie) => {
-            let startTime = new Date(movie.release_date);
-            let endTime = new Date(startTime);
+            const startTime = new Date(movie.release_date);
+            const endTime = new Date(startTime);
             endTime.setTime(endTime.getTime() + 14 * 86400000);
             return db.db('nativeMatch').collection('event').update({
                 moviedbId: movie.id,

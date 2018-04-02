@@ -40,9 +40,9 @@ router.get('/:id', (req, res) => {
 });
 
 router.get('/', (req, res) => {
-    let queryTime = req.query.afterTime ? 
-        new Date(req.query.afterTime) : new Date();
-    let maxEvents = req.query.maxEvents ? req.query.maxEvents : 25;
+    const queryTime = req.query.afterTime
+        ? new Date(req.query.afterTime) : new Date();
+    const maxEvents = req.query.maxEvents ? req.query.maxEvents : 25;
     Promise.all([
         req.db.collection('event').find({
             location: {
@@ -62,7 +62,7 @@ router.get('/', (req, res) => {
             return events.filter((event) => {
                 return event.startTime > queryTime;
             });
-        }), 
+        }),
         req.db.collection('event').find({
             $and: [{
                 location: {
@@ -76,7 +76,7 @@ router.get('/', (req, res) => {
         }, { sort: ['startTime', 'endTime'] }).limit(maxEvents)
         .toArray(),
     ]).then((results) => {
-        return [].concat.apply([], results).slice(0,maxEvents);
+        return [].concat.apply([], results).slice(0, maxEvents);
     }).then((results) => {
         res.send(JSON.stringify(results));
     });

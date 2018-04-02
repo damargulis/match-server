@@ -8,28 +8,22 @@
         "sourceType": "module"
     },
     "rules": {
-        "indent": [
-            "error",
-            4,
-            {
-                "MemberExpression": 0
-            }
-        ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
-        "quotes": [
-            "error",
-            "single"
-        ],
-        "semi": [
-            "error",
-            "always"
-        ],
-        "max-len": [
-            2
-        ],
-        "comma-dangle": ["error", "always-multiline"]
+        "indent": ["error", 4, {"MemberExpression": 0}],
+        "linebreak-style": ["error", "unix"],
+        "quotes": ["error", "single"],
+        "semi": ["error", "always"],
+        "max-len": [2],
+        "comma-dangle": ["error", "always-multiline"],
+        "no-multi-spaces": ["error"],
+        "array-bracket-newline": ["error", "consistent"],
+        "array-bracket-spacing": ["error", "never"],
+        "brace-style": ["error", "1tbs", {"allowSingleLine": true}],
+        "comma-spacing": ["error", {"before": false, "after": true}],
+        "no-multiple-empty-lines": ["error", {"max": 1}],
+        "no-trailing-spaces": ["error"],
+        "operator-linebreak": ["error", "before"],
+        "padded-blocks": ["error", "never"],
+        "quotes": ["error", "single"],
+        "prefer-const": ["error"]
     }
 }

@@ -10,7 +10,7 @@ const path = require('path');
 
 var passwordHash = require('password-hash');
 
-const uri = 'mongodb://' + mongoUser + ':' + mongoPw 
+const uri = 'mongodb://' + mongoUser + ':' + mongoPw
     + '@nativematch-shard-00-00-fvbif.mongodb.net:27017,nativematch-shard-00-01'
     + '-fvbif.mongodb.net:27017,nativematch-shard-00-02-fvbif.mongodb.net:27017'
     + '/test?ssl=true&replicaSet=nativeMatch-shard-0&authSource=admin';
@@ -243,25 +243,25 @@ function reset() {
         ]);
     }).then(() => {
         console.log('adding user location index');
-        let user = nativeMatch.collection('user');
+        const user = nativeMatch.collection('user');
         return user.ensureIndex({ location: '2dsphere' });
     }).then(() => {
         console.log('adding event location index');
-        let event = nativeMatch.collection('event');
+        const event = nativeMatch.collection('event');
         return event.ensureIndex({ location: '2dsphere' }, {sparse: true});
     }).then(() => {
         console.log('adding event movieid index');
-        let event = nativeMatch.collection('event');
+        const event = nativeMatch.collection('event');
         return event.ensureIndex({ moviedbId: 1}, {unique: true, sparse: true});
     }).then(() => {
         console.log('Adding User 1 Photo');
         return new Promise(function(resolve, reject) {
-            let file = fs.readFileSync(
+            const file = fs.readFileSync(
                 path.resolve(__dirname, './stickman.png')
             );
             gfs.writeFile(
-                {filename: 'test', mode: 'w', content_type: 'image'}, 
-                file, 
+                {filename: 'test', mode: 'w', content_type: 'image'},
+                file,
                 (err, file) => {
                     if(err) {
                         reject(err);
@@ -278,7 +278,7 @@ function reset() {
     }).then(() => {
         console.log('Adding User 2 Photo');
         return new Promise(function(resolve, reject) {
-            let file = fs.readFileSync(
+            const file = fs.readFileSync(
                 path.resolve(__dirname, './stickwoman.jpg')
             );
             gfs.writeFile(
@@ -305,5 +305,5 @@ function reset() {
     });
 }
 
-reset();	
+reset();
 /*eslint-enable no-console*/

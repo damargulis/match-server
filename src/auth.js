@@ -64,10 +64,10 @@ router.post('/createAccount', (req, res) => {
             success: true,
             userId: user._id,
             user: user,
-        }));	
+        }));
     }).catch((error) => {
-        const message = error instanceof UserError ? 
-            error.message : 'Something Went Wrong';
+        const message = error instanceof UserError
+            ? error.message : 'Something Went Wrong';
         res.send(JSON.stringify({
             success: false,
             reason: message,

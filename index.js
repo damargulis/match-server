@@ -15,7 +15,7 @@ const websocket = socketio(server, {pingTimeout: 30000, path: '/socket.io'});
 const mongoPw = process.env.MONGO_PASSWORD;
 const mongoUser = process.env.MONGO_USER;
 
-const uri = 'mongodb://' + mongoUser + ':' + mongoPw 
+const uri = 'mongodb://' + mongoUser + ':' + mongoPw
     + '@nativematch-shard-00-00-fvbif.mongodb.net:27017,nativematch-shard-00-01'
     + '-fvbif.mongodb.net:27017,nativematch-shard-00-02-fvbif.mongodb.net:27017'
     + '/test?ssl=true&replicaSet=nativeMatch-shard-0&authSource=admin';
@@ -25,7 +25,6 @@ app.use(bodyParser.json());
 app.use(fileUpload());
 
 app.use('/', (req, res, next) => {
-
     /*eslint-disable no-console*/
     console.log(req.originalUrl);
     /*eslint-enable no-console*/

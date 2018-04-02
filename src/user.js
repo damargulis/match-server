@@ -14,7 +14,7 @@ router.post('/:id/location', (req, res) => {
 });
 
 router.post('/:id/photos', (req, res) => {
-    req.gfs.writeFile({filename: 'test', mode: 'w', content_type: 'image'}, 
+    req.gfs.writeFile({filename: 'test', mode: 'w', content_type: 'image'},
         req.files.photo.data, (err, file) => {
             if(err) throw Error('Shit done fucked');
             req.db.collection('user').updateOne(
@@ -40,14 +40,13 @@ router.get('/photo/:id', (req, res) => {
 router.get('/:id/events', (req, res) => {
     req.db.collection('user').findOne({_id: new ObjectID(req.params.id)})
     .then((user) => {
-        let attending = user.attending.map((evt) => new ObjectID(evt));
+        const attending = user.attending.map((evt) => new ObjectID(evt));
         req.db.collection('event').find({_id: { '$in': attending } })
         .toArray().then((events) => {
             res.send(JSON.stringify(events));
         });
     });
 });
-    
 
 router.get('/:id', (req, res) => {
     req.db.collection('user').findOne({_id: new ObjectID(req.params.id)})

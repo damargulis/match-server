@@ -3,21 +3,20 @@ const ObjectID = require('mongodb').ObjectID;
 var router = express.Router();
 
 module.exports = function(websocket) {
-
-    function isEligable(user, test_id, db) {
-        return db.collection('user').findOne({_id: new ObjectID(test_id)})
-        .then((test_user) => {
-            if(test_user.age > user.interestsAgeMax 
-                || test_user.age < user.interestsAgeMin
+    function isEligable(user, testId, db) {
+        return db.collection('user').findOne({_id: new ObjectID(testId)})
+        .then((testUser) => {
+            if(testUser.age > user.interestsAgeMax
+                || testUser.age < user.interestsAgeMin
             ) {
                 return false;
             }
-            if(test_user.gender != user.interestsGender 
+            if(testUser.gender != user.interestsGender
                 && user.interestsGender != 'Any'
             ){
                 return false;
             }
-            if(user.liked.includes(test_id) || user.disliked.includes(test_id)){
+            if(user.liked.includes(testId) || user.disliked.includes(testId)){
                 return false;
             }
             //TODO: Test distance and whatever else
@@ -28,13 +27,13 @@ module.exports = function(websocket) {
     router.get('/possibleMatches/:id', (req, res) => {
         req.db.collection('user').findOne({ _id: new ObjectID(req.params.id) })
         .then((user) => {
-            let attendingEvents = [];
+            const attendingEvents = [];
             for(var i=0; i<user.attending.length; i++){
                 attendingEvents.push(new ObjectID(user.attending[i]));
             }
             req.db.collection('event').find({ _id: { $in: attendingEvents } })
             .toArray().then((events) => {
-                let users = events.reduce((users, evt) => {
+                const users = events.reduce((users, evt) => {
                     for(var i = 0; i<evt.attendees.length; i++){
                         if(evt.attendees[i] != req.params.id){
                             users.add(evt.attendees[i]);
@@ -51,11 +50,10 @@ module.exports = function(websocket) {
                     res.send(JSON.stringify({
                         swipeDeck: results,
                     }));
-                });	
+                });
             });
         });
     });
-
 
     function createMatch(user, swipe, db){
         db.collection('user').update({ _id: new ObjectID(user._id) },
@@ -64,8 +62,8 @@ module.exports = function(websocket) {
         db.collection('user').update({ _id: new ObjectID(swipe._id) },
             { $push: { matches: user._id } }
         );
-        let swipeEvents = new Set(swipe.attending);
-        let commonEvents = user.attending.filter(
+        const swipeEvents = new Set(swipe.attending);
+        const commonEvents = user.attending.filter(
             event => swipeEvents.has(event)
         ).map((eventId) => new ObjectID(eventId));
         db.collection('event').find( {
@@ -90,7 +88,7 @@ module.exports = function(websocket) {
                 );
                 websocket.of('/matchNotification').to(user._id).emit(
                     'newMatch', {
-                        match: swipe, 
+                        match: swipe,
                     }
                 );
             });
@@ -102,7 +100,7 @@ module.exports = function(websocket) {
         .then((user) => {
             db.collection('user').findOne({ _id: new ObjectID(swipeId) })
             .then((swipe) => {
-                if(swipe.liked.includes(userId) 
+                if(swipe.liked.includes(userId)
                     && user.liked.includes(swipeId)
                 ){
                     createMatch(user, swipe, db);

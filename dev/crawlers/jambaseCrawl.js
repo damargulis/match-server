@@ -29,7 +29,7 @@ function crawlRequest(url, query={}, results=[]){
     };
     return rp(options)
     .then((response) => {
-        let totalResults = results.concat(response.Events);
+        const totalResults = results.concat(response.Events);
         if(totalResults.length >= response.Info.TotalResults){
             return totalResults;
         }else{
@@ -55,9 +55,9 @@ function crawlRequest(url, query={}, results=[]){
 
 console.log('Crawling concerts for ', ZIP_CODE);
 crawlRequest(BASE_URL, {
-    api_key: API_KEY, 
-    radius: 50, 
-    startDate: new Date(), 
+    api_key: API_KEY,
+    radius: 50,
+    startDate: new Date(),
     zipCode: ZIP_CODE}
 ).then((response) => {
     console.log('Finished crawl');
@@ -67,11 +67,11 @@ crawlRequest(BASE_URL, {
         db = database;
         console.log('upserting concerts');
         return Promise.all(response.map((event) => {
-            let name = event.Artists.map((artist) => { 
-                return artist.Name; 
+            const name = event.Artists.map((artist) => {
+                return artist.Name;
             }).join(', ');
-            let startTime = new Date(event.Date);
-            let endTime = new Date(event.Date);
+            const startTime = new Date(event.Date);
+            const endTime = new Date(event.Date);
             endTime.setHours(24);
             return db.db('nativeMatch').collection('event').update({
                 jambaseId: event.Id,

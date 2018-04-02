@@ -1,7 +1,7 @@
 const ObjectID = require('mongodb').ObjectID;
 
 var onConnect = (socket, mongoConnection) => {
-    let id = socket.handshake.query.chatId;
+    const id = socket.handshake.query.chatId;
     socket.join(id);
 
     socket.on('sendMessage', function(data) {
