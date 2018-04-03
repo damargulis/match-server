@@ -1,4 +1,5 @@
 const express = require('express');
+const morgan = require('morgan');
 const fileUpload = require('express-fileupload');
 const http = require('http');
 const bodyParser = require('body-parser');
@@ -23,13 +24,7 @@ const uri = 'mongodb://' + mongoUser + ':' + mongoPw
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(fileUpload());
-
-app.use('/', (req, res, next) => {
-    /*eslint-disable no-console*/
-    console.log(req.originalUrl);
-    /*eslint-enable no-console*/
-    next();
-});
+app.use(morgan('dev'));
 
 var mongoConnection;
 var gfs;
