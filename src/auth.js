@@ -71,7 +71,7 @@ router.post('/createAccount', (req, res) => {
             ? error.message : 'Something Went Wrong';
         res.status(400).send(JSON.stringify({
             success: false,
-            reason: message,
+            message: message,
         }));
     });
 });
