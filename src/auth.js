@@ -14,8 +14,9 @@ router.post('/login', (req, res) => {
                 user: user,
             }));
         } else {
-            res.send(JSON.stringify({
+            res.status(401).send(JSON.stringify({
                 success: false,
+                message: 'Incorrect username or password',
             }));
         }
     });
@@ -68,7 +69,7 @@ router.post('/createAccount', (req, res) => {
     }).catch((error) => {
         const message = error instanceof UserError
             ? error.message : 'Something Went Wrong';
-        res.send(JSON.stringify({
+        res.status(400).send(JSON.stringify({
             success: false,
             reason: message,
         }));
