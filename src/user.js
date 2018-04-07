@@ -60,11 +60,17 @@ router.put('/:id', (req, res) => {
     delete req.body.profile.id;
     delete req.body.profile.username;
     delete req.body.profile.password;
-    req.db.collection('user').updateOne(
+    req.db.collection('user').findOneAndUpdate(
         {_id: new ObjectID(req.params.id)},
-        { $set: req.body.profile }
-    ).then(() => {
-        res.send(JSON.stringify({success: true}));
+        { $set: req.body.profile },
+        { returnOriginal: false}
+    ).then((response) => {
+        res.send(
+            JSON.stringify({
+                success: true,
+                profile: response.value,
+            })
+        );
     });
 });
 
