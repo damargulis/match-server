@@ -13,13 +13,24 @@ router.get('/rsvp', (req, res) => {
 });
 
 router.post('/rsvp', (req, res) => {
-    req.db.collection('event').update({_id: new ObjectID(req.body.eventId)},
-        { $push: { attendees: req.body.userId } }
-    );
-    req.db.collection('user').update({_id: new ObjectID(req.body.userId)},
-        { $push: {attending: req.body.eventId } }
-    );
-    res.send(JSON.stringify({success: true}));
+    Promise.all([
+        req.db.collection('event').findOneAndUpdate(
+            {_id: new ObjectID(req.body.eventId)},
+            { $push: {attendees: req.body.userId } },
+            { returnOriginal: false }
+        ),
+        req.db.collection('user').findOneAndUpdate(
+            {_id: new ObjectID(req.body.userId)},
+            { $push: {attending: req.body.eventId } },
+            { returnOriginal: false }
+        ),
+    ]).then((data) => {
+        res.send(JSON.stringify({
+            success: true,
+            event: data[0].value,
+            profile: data[1].value,
+        }));
+    });
 });
 
 router.post('/cancel', (req, res) => {
