@@ -74,7 +74,87 @@ function reset() {
             }),
             new Promise(function(resolve, reject) {
                 const file = fs.readFileSync(
+                    path.resolve(__dirname, './stickman2.png')
+                );
+                gfs.writeFile(
+                    {filename: 'test', mode: 'w', content_type: 'image'},
+                    file,
+                    (err, file) => {
+                        if(err) {
+                            reject(err);
+                        } else {
+                            nativeMatch.collection('user').updateOne(
+                                {username: 'test'},
+                                {$push: {photos: file._id } }
+                            ).then(() => {
+                                resolve();
+                            });
+                        }
+                    });
+            }),
+            new Promise(function(resolve, reject) {
+                const file = fs.readFileSync(
+                    path.resolve(__dirname, './stickman3.png')
+                );
+                gfs.writeFile(
+                    {filename: 'test', mode: 'w', content_type: 'image'},
+                    file,
+                    (err, file) => {
+                        if(err) {
+                            reject(err);
+                        } else {
+                            nativeMatch.collection('user').updateOne(
+                                {username: 'test'},
+                                {$push: { photos: file._id } }
+                            ).then(() => {
+                                resolve();
+                            });
+                        }
+                    });
+            }),
+            new Promise(function(resolve, reject) {
+                const file = fs.readFileSync(
                     path.resolve(__dirname, './stickwoman.jpg')
+                );
+                gfs.writeFile(
+                    {filename: 'test', mode: 'w', content_type: 'image'},
+                    file,
+                    (err, file) => {
+                        if(err) {
+                            reject(err);
+                        } else {
+                            nativeMatch.collection('user').updateOne(
+                                {username: 'test1'},
+                                { $push: {photos: file._id } }
+                            ).then(() => {
+                                resolve();
+                            });
+                        }
+                    });
+            }),
+            new Promise(function(resolve, reject) {
+                const file = fs.readFileSync(
+                    path.resolve(__dirname, './stickwoman2.png')
+                );
+                gfs.writeFile(
+                    {filename: 'test', mode: 'w', content_type: 'image'},
+                    file,
+                    (err, file) => {
+                        if(err) {
+                            reject(err);
+                        } else {
+                            nativeMatch.collection('user').updateOne(
+                                {username: 'test1'},
+                                { $push: {photos: file._id } }
+                            ).then(() => {
+                                resolve();
+                            });
+                        }
+                    });
+            }),
+            new Promise(function(resolve, reject) {
+                const file = fs.readFileSync(
+                    path.resolve(__dirname, './stickwoman3.jpg')
                 );
                 gfs.writeFile(
                     {filename: 'test', mode: 'w', content_type: 'image'},
