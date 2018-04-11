@@ -15,6 +15,29 @@ const uri = 'mongodb://' + mongoUser + ':' + mongoPw
 
 const data = require('./data.js');
 
+function uploadPhoto(gfs, nativeMatch, photo, username) {
+    const file = fs.readFileSync(
+        path.resolve(__dirname, photo)
+    );
+    return new Promise((resolve, reject) => {
+        gfs.writeFile(
+            {filename: 'test', mode: 'w', content_type: 'image'},
+            file,
+            (err, file) => {
+                if(err) {
+                    reject(err);
+                } else {
+                    nativeMatch.collection('user').updateOne(
+                        {username: username},
+                        { $push: {photos: file._id } }
+                    ).then(() => {
+                        resolve();
+                    });
+                }
+            });
+    });
+}
+
 function reset() {
     let database = null;
     let nativeMatch = null;
@@ -51,128 +74,16 @@ function reset() {
         ]);
     }).then(() => {
         console.log('Adding Photos');
-        return Promise.all([
-            new Promise(function(resolve, reject) {
-                const file = fs.readFileSync(
-                    path.resolve(__dirname, './stickman.png')
+        return Promise.all(
+            data.photos.map((photo) => {
+                return uploadPhoto(
+                    gfs,
+                    nativeMatch,
+                    photo.photo,
+                    photo.username
                 );
-                gfs.writeFile(
-                    {filename: 'test', mode: 'w', content_type: 'image'},
-                    file,
-                    (err, file) => {
-                        if(err) {
-                            reject(err);
-                        } else {
-                            nativeMatch.collection('user').updateOne(
-                                {username: 'test'},
-                                { $push: {photos: file._id } }
-                            ).then(() => {
-                                resolve();
-                            });
-                        }
-                    });
-            }),
-            new Promise(function(resolve, reject) {
-                const file = fs.readFileSync(
-                    path.resolve(__dirname, './stickman2.png')
-                );
-                gfs.writeFile(
-                    {filename: 'test', mode: 'w', content_type: 'image'},
-                    file,
-                    (err, file) => {
-                        if(err) {
-                            reject(err);
-                        } else {
-                            nativeMatch.collection('user').updateOne(
-                                {username: 'test'},
-                                {$push: {photos: file._id } }
-                            ).then(() => {
-                                resolve();
-                            });
-                        }
-                    });
-            }),
-            new Promise(function(resolve, reject) {
-                const file = fs.readFileSync(
-                    path.resolve(__dirname, './stickman3.png')
-                );
-                gfs.writeFile(
-                    {filename: 'test', mode: 'w', content_type: 'image'},
-                    file,
-                    (err, file) => {
-                        if(err) {
-                            reject(err);
-                        } else {
-                            nativeMatch.collection('user').updateOne(
-                                {username: 'test'},
-                                {$push: { photos: file._id } }
-                            ).then(() => {
-                                resolve();
-                            });
-                        }
-                    });
-            }),
-            new Promise(function(resolve, reject) {
-                const file = fs.readFileSync(
-                    path.resolve(__dirname, './stickwoman.jpg')
-                );
-                gfs.writeFile(
-                    {filename: 'test', mode: 'w', content_type: 'image'},
-                    file,
-                    (err, file) => {
-                        if(err) {
-                            reject(err);
-                        } else {
-                            nativeMatch.collection('user').updateOne(
-                                {username: 'test1'},
-                                { $push: {photos: file._id } }
-                            ).then(() => {
-                                resolve();
-                            });
-                        }
-                    });
-            }),
-            new Promise(function(resolve, reject) {
-                const file = fs.readFileSync(
-                    path.resolve(__dirname, './stickwoman2.png')
-                );
-                gfs.writeFile(
-                    {filename: 'test', mode: 'w', content_type: 'image'},
-                    file,
-                    (err, file) => {
-                        if(err) {
-                            reject(err);
-                        } else {
-                            nativeMatch.collection('user').updateOne(
-                                {username: 'test1'},
-                                { $push: {photos: file._id } }
-                            ).then(() => {
-                                resolve();
-                            });
-                        }
-                    });
-            }),
-            new Promise(function(resolve, reject) {
-                const file = fs.readFileSync(
-                    path.resolve(__dirname, './stickwoman3.jpg')
-                );
-                gfs.writeFile(
-                    {filename: 'test', mode: 'w', content_type: 'image'},
-                    file,
-                    (err, file) => {
-                        if(err) {
-                            reject(err);
-                        } else {
-                            nativeMatch.collection('user').updateOne(
-                                {username: 'test1'},
-                                { $push: {photos: file._id } }
-                            ).then(() => {
-                                resolve();
-                            });
-                        }
-                    });
-            }),
-        ]);
+            })
+        );
     }).then(() => {
         console.log('finished');
         database.close();

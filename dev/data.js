@@ -208,7 +208,28 @@ const events = [
     },
 ];
 
+const photos = [{
+    photo: 'stickman.png',
+    username: 'test',
+}, {
+    photo: 'stickman2.png',
+    username: 'test',
+}, {
+    photo: 'stickman3.png',
+    username: 'test',
+}, {
+    photo: 'stickwoman.jpg',
+    username: 'test1',
+}, {
+    photo: 'stickwoman2.png',
+    username: 'test1',
+}, {
+    photo: 'stickwoman3.jpg',
+    username: 'test1',
+}];
+
 module.exports = {
     users,
     events,
+    photos,
 };
