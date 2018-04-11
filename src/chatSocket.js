@@ -7,7 +7,7 @@ var onConnect = (socket, mongoConnection) => {
     socket.on('sendMessage', function(data) {
         mongoConnection.collection('chat').updateOne(
             {_id: new ObjectID(id) },
-            { $push: { messages: data.message[0] } }
+            { $push: { messages: { $each: data.message, $position: 0 } } }
         );
         socket.broadcast.to(id).emit('receiveMessage', {
             message: data,
