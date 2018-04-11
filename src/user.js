@@ -13,6 +13,19 @@ router.post('/:id/location', (req, res) => {
     });
 });
 
+router.delete('/:id/photo/:photoId', (req, res) => {
+    req.gfs.remove({_id: new ObjectID(req.params.photoId)}, () => {
+        req.db.collection('user').updateOne(
+            {_id: new ObjectID(req.params.id) },
+            { $pull: { photos: new ObjectID(req.params.photoId) } }
+        ).then(() => {
+            res.send(JSON.stringify({
+                success: 'true',
+            }));
+        });
+    });
+});
+
 router.post('/:id/photos', (req, res) => {
     req.gfs.writeFile({filename: 'test', mode: 'w', content_type: 'image'},
         req.files.photo.data, (err, file) => {
