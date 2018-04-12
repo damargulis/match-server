@@ -98,7 +98,11 @@ router.get('/', (req, res) => {
         }, { sort: ['startTime', 'endTime'] }).limit(maxEvents)
         .toArray(),
     ]).then((results) => {
-        return [].concat.apply([], results).slice(0, maxEvents);
+        return ([].concat.apply([], results).slice(0, maxEvents))
+        .sort((a, b) => {
+            return (new Date(a.startTime)) - (new Date(b.startTime));
+        }
+        );
     }).then((results) => {
         res.send(JSON.stringify(results));
     });
