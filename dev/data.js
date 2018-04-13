@@ -1,52 +1,73 @@
 var passwordHash = require('password-hash');
 
-const users = [{
-    username: 'test',
-    password: passwordHash.generate('test'),
-    firstName: 'Dan',
-    age: 23,
-    gender: 'Male',
-    occupation: 'Software Engineer',
-    school: 'Washington University in St. Louis',
-    interestsGender: 'Female',
-    interestsDistance: 50,
-    interestsAgeMin: 20,
-    interestsAgeMax: 25,
-    location: {
-        type: 'Point',
-        coordinates: [
-            -90.295861,
-            38.650768,
-        ],
-    },
-    attending: [],
-    liked: [],
-    disliked: [],
-    photos: [],
-}, {
-    username: 'test1',
-    password: passwordHash.generate('test1'),
-    firstName: 'Jane',
-    age: 23,
-    gender: 'Female',
-    occupation: 'Designer',
-    school: 'St. Louis University',
-    interestsGender: 'Male',
-    interestsDistance: 50,
-    interestsAgeMin: 20,
-    interestsAgeMax: 25,
-    location: {
-        type: 'Point',
-        coordinates: [
-            -90.295861,
-            36.650768,
-        ],
-    },
-    attending: [],
-    liked: [],
-    disliked: [],
-    photos: [],
-}];
+function createUser(firstName, gender, occupation, school) {
+    //password is username is firstName
+    return {
+        username: firstName,
+        password: passwordHash.generate(firstName),
+        firstName: firstName,
+        gender: gender ? 'Male' : 'Female',
+        age: 24,
+        occupation: occupation,
+        school: school,
+        interestsGender: gender ? 'Female' : 'Male',
+        interestsAgeMin: 20,
+        interestsAgeMax: 25,
+        interestsDistance: 50,
+        location: {
+            type: 'Point',
+            coordinates: [
+                -90.295861,
+                38.650768,
+            ],
+        },
+        attending: [],
+        liked: [],
+        disliked: [],
+        photos: [],
+    };
+}
+
+function createUsers(){
+    return [{
+        name: 'Jim',
+        male: true,
+        occupation: 'Salesman',
+        school: 'Scranton University',
+    }, {
+        name: 'Pam',
+        male: false,
+        occupation: 'Secratery',
+        school: 'Marywood University',
+    }, {
+        name: 'Troy',
+        male: true,
+        occupation: 'Sailor',
+        school: 'Greendale University',
+    }, {
+        name: 'Annie',
+        male: false,
+        occupation: 'Forensic Analyist',
+        school: 'Greendale University',
+    }, {
+        name: 'Leslie',
+        male: false,
+        occupation: 'Director of the National Parks Service',
+        school: 'Pawnee Community College',
+    }, {
+        name: 'Ben',
+        male: true,
+        occupation: 'Congressman',
+        school: 'Indiana University',
+    }].map((user) => createUser(
+        user.name,
+        user.male,
+        user.occupation,
+        user.school
+    ));
+}
+
+const users = createUsers();
 
 const today = new Date();
 today.setHours(0);
@@ -209,23 +230,47 @@ const events = [
 ];
 
 const photos = [{
-    photo: 'stickman.png',
-    username: 'test',
+    username: 'Jim',
+    photo: 'Jim1.jpg',
 }, {
-    photo: 'stickman2.png',
-    username: 'test',
+    username: 'Jim',
+    photo: 'Jim2.jpg',
 }, {
-    photo: 'stickman3.png',
-    username: 'test',
+    username: 'Pam',
+    photo: 'Pam1.jpg',
 }, {
-    photo: 'stickwoman.jpg',
-    username: 'test1',
+    username: 'Pam',
+    photo: 'Pam2.jpg',
 }, {
-    photo: 'stickwoman2.png',
-    username: 'test1',
+    username: 'Pam',
+    photo: 'Pam3.jpg',
 }, {
-    photo: 'stickwoman3.jpg',
-    username: 'test1',
+    username: 'Troy',
+    photo: 'Troy1.jpg',
+}, {
+    username: 'Troy',
+    photo: 'Troy2.jpg',
+}, {
+    username: 'Annie',
+    photo: 'Annie1.jpg',
+}, {
+    username: 'Annie',
+    photo: 'Annie2.jpg',
+}, {
+    username: 'Annie',
+    photo: 'Annie3.jpg',
+}, {
+    username: 'Leslie',
+    photo: 'Leslie1.png',
+}, {
+    username: 'Leslie',
+    photo: 'Leslie2.jpg',
+}, {
+    username: 'Ben',
+    photo: 'Ben1.jpg',
+}, {
+    username: 'Ben',
+    photo: 'Ben2.png',
 }];
 
 module.exports = {
